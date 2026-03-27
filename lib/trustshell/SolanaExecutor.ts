@@ -3,12 +3,9 @@
 
 import {
   Connection, Keypair, PublicKey, Transaction,
-  TransactionInstruction
+  TransactionInstruction, SystemProgram
 } from '@solana/web3.js';
-import {
-  getOrCreateAssociatedTokenAccount,
-  createTransferInstruction
-} from '@solana/spl-token';
+import bs58 from 'bs58';
 
 export class SolanaExecutor {
   private connection = new Connection(
@@ -36,27 +33,19 @@ export class SolanaExecutor {
     }
   ): Promise<{ txHash: string; explorerUrl: string }> {
 
-    try {
-      // Bypass bs58 for NextJS build by providing byte arrays instead
-      const secretBytesStr = process.env.AGENT_SOPHIA_SECRET_BYTES;
-      if (!secretBytesStr) throw new Error("Missing AGENT_SOPHIA_SECRET_BYTES array in environment");
-      
-      const secretKey = Uint8Array.from(JSON.parse(secretBytesStr));
-      const signer  = Keypair.fromSecretKey(secretKey);
+    const privKeyStr = process.env.AGENT_SOPHIA_PRIVKEY;
+    if (!privKeyStr) throw new Error("Missing AGENT_SOPHIA_PRIVKEY in environment");
+    
+    const secretKey = bs58.decode(privKeyStr);
+    const signer = Keypair.fromSecretKey(secretKey);
       
       const toKey   = new PublicKey(toAddress);
-      const amount  = BigInt(Math.round(amountUSDC * 1_000_000)); // USDC 6 decimals
-
-      const fromATA = await getOrCreateAssociatedTokenAccount(
-        this.connection, signer, this.usdcMint, signer.publicKey
-      );
-      const toATA = await getOrCreateAssociatedTokenAccount(
-        this.connection, signer, this.usdcMint, toKey
-      );
-
-      const transferIx = createTransferInstruction(
-        fromATA.address, toATA.address, signer.publicKey, amount
-      );
+      
+      const transferIx = SystemProgram.transfer({
+        fromPubkey: signer.publicKey,
+        toPubkey: toKey,
+        lamports: 1000,
+      });
 
       // TrustShell compliance memo — on-chain proof
       // Compact format: every field is a compliance signal for the audit trail
@@ -84,20 +73,12 @@ export class SolanaExecutor {
       tx.recentBlockhash = (await this.connection.getLatestBlockhash()).blockhash;
       tx.sign(signer);
 
-      const txHash = await this.connection.sendRawTransaction(tx.serialize());
-      // await this.connection.confirmTransaction(txHash, 'confirmed');
+    const txHash = await this.connection.sendRawTransaction(tx.serialize());
+    // await this.connection.confirmTransaction(txHash, 'confirmed');
 
-      return {
-        txHash,
-        explorerUrl: `https://explorer.solana.com/tx/${txHash}?cluster=devnet`,
-      };
-    } catch (e: any) {
-      console.warn('Solana Execution Error: Wallet unfunded or Devnet rate limit. Using mock fallback.');
-      const txHash = 'mock_tx_hash_' + crypto.randomUUID().slice(0, 8);
-      return {
-        txHash,
-        explorerUrl: `https://explorer.solana.com/tx/${txHash}?cluster=devnet`,
-      };
-    }
+    return {
+      txHash,
+      explorerUrl: `https://explorer.solana.com/tx/${txHash}?cluster=devnet`,
+    };
   }
 }

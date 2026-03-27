@@ -137,7 +137,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       approved: false,
       stage: 'execution',
-      error: error.message,
+      error: String(error),
+      stack: error?.stack
     }, { status: 500 });
   }
 }

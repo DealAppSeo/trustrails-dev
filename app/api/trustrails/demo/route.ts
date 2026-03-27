@@ -5,7 +5,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const BASE = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const isDev = process.env.NODE_ENV !== 'production';
+  const BASE = isDev ? 'http://localhost:3000' : (process.env.NEXT_PUBLIC_APP_URL || 'https://trustrails.dev');
   const institution = req.nextUrl.searchParams.get('institution') || 'default';
 
   const results: any[] = [];
