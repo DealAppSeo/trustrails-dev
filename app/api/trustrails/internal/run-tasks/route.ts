@@ -17,7 +17,7 @@ export async function GET(req: any) {
     process.env.SUPABASE_SERVICE_ROLE_KEY
   );
 
-  const results = { dbUpdates: {}, sprintReport: {}, registryAudit: null };
+  const results = { dbUpdates: {}, sprintReport: {}, registryAudit: 0 };
 
   const { data: registryData } = await supabase.from('agent_kya_registry').select('*');
   results.registryAudit = registryData ? registryData.length : 0;
