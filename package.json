@@ -1,0 +1,34 @@
+{
+  "name": "trustrails-dev",
+  "version": "1.0.0",
+  "description": "TrustRails — KYA Infrastructure for Institutional AI Agent Finance",
+  "private": true,
+  "scripts": {
+    "dev":   "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint":  "next lint"
+  },
+  "dependencies": {
+    "next":                    "14.2.0",
+    "react":                   "^18.2.0",
+    "react-dom":               "^18.2.0",
+    "@supabase/supabase-js":   "^2.39.0",
+    "@solana/web3.js":         "^1.87.6",
+    "@solana/spl-token":       "^0.4.0",
+    "bs58":                    "^5.0.0",
+    "@tailwindcss/postcss": "latest",
+    "tailwindcss": "latest",
+    "postcss": "latest",
+    "clsx": "latest",
+    "tailwind-merge": "latest",
+    "lucide-react": "latest"
+  },
+  "devDependencies": {
+    "@types/node":    "^20.0.0",
+    "@types/react":   "^18.2.0",
+    "typescript":     "^5.0.0",
+    "eslint": "latest",
+    "eslint-config-next": "latest"
+  }
+}
