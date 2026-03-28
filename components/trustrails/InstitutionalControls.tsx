@@ -23,7 +23,7 @@ const CONTROL_GROUPS = [
   {
     id:      'ceo',
     label:   '👔 Executive Controls',
-    persona: 'Bank President / CEO',
+    persona: 'Your Bank President / CEO',
     controls: [
       { key: 'max_aggregate_daily_usdc',    type: 'currency', label: 'Maximum aggregate daily exposure (all agents)', default: 1000000 },
       { key: 'board_notification_threshold', type: 'currency', label: 'Board notification threshold (auto-alert above)', default: 100000 },

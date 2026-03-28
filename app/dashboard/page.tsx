@@ -526,7 +526,11 @@ export default function Dashboard() {
               at every threshold, with full audit trail.<br/><br/>
               This is how you stay ahead of competitors who are waiting.<br/>
               Safe agents. Verifiable compliance. Institutional control.<br/><br/>
-              <span style={{ color: '#60a5fa' }}>← Switch to Conservative profile and run again to see exactly how AMINA Bank configures their controls →</span>
+              <span style={{ color: '#60a5fa' }}>
+                ← {profile === 'conservative' ? 'Switch to Balanced profile and run again — watch how relaxed limits change every outcome' :
+                   profile === 'balanced' ? 'Switch to Conservative profile and run again — see how a cautious institution like AMINA Bank would configure their controls' :
+                   'Switch to Conservative profile and run again — see the difference between maximum autonomy and maximum institutional control'} →
+              </span>
             </div>
           </div>
         )}
