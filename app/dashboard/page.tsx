@@ -569,9 +569,9 @@ export default function Dashboard() {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 60px 1fr 60px 1fr',
+            gridTemplateColumns: '1fr 48px 1fr 48px 1fr',
             gap: '0',
-            alignItems: 'center'
+            alignItems: 'stretch'
           }}>
 
             {/* Column 1 — DBT Agent */}
@@ -580,7 +580,9 @@ export default function Dashboard() {
               border: '1px solid #8b9ab0',
               borderRadius: '8px',
               padding: '20px',
-              textAlign: 'center'
+              textAlign: 'center',
+              height: '100%',
+              boxSizing: 'border-box'
             }}>
               <div style={{ fontSize: '28px', marginBottom: '8px' }}>💳</div>
               <div style={{
@@ -613,7 +615,10 @@ export default function Dashboard() {
               textAlign: 'center',
               color: '#1d4ed8',
               fontSize: '20px',
-              lineHeight: '1.2'
+              lineHeight: '1.2',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center'
             }}>
               →<br/>
               <span style={{
@@ -631,7 +636,9 @@ export default function Dashboard() {
               border: '1px solid #1d4ed8',
               borderRadius: '8px',
               padding: '20px',
-              textAlign: 'center'
+              textAlign: 'center',
+              height: '100%',
+              boxSizing: 'border-box'
             }}>
               <div style={{ fontSize: '28px', marginBottom: '8px' }}>🔐</div>
               <div style={{
@@ -665,7 +672,10 @@ export default function Dashboard() {
               textAlign: 'center',
               color: '#166534',
               fontSize: '20px',
-              lineHeight: '1.2'
+              lineHeight: '1.2',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center'
             }}>
               ⛓<br/>
               <span style={{
@@ -683,7 +693,9 @@ export default function Dashboard() {
               border: '1px solid #166534',
               borderRadius: '8px',
               padding: '20px',
-              textAlign: 'center'
+              textAlign: 'center',
+              height: '100%',
+              boxSizing: 'border-box'
             }}>
               <div style={{ fontSize: '28px', marginBottom: '8px' }}>⛓</div>
               <div style={{
@@ -706,17 +718,11 @@ export default function Dashboard() {
                 Custodian: revocable<br/>
                 <br/>
                 <em style={{ color: '#94a3b8', fontSize: '14px' }}>
-                  Like a college student's<br/>
-                  first credit card —<br/>
-                  parent co-signs,<br/>
-                  limits grow with trust,<br/>
-                  parent released when<br/>
+                  Like a parent co-signing<br/>
+                  a student's first credit card.<br/>
+                  Parent released when<br/>
                   student proves worthy.
-                </em><br/>
-                <br/>
-                Agent earns autonomy.<br/>
-                Human SBT is freed<br/>
-                for the next agent.
+                </em>
               </div>
             </div>
 

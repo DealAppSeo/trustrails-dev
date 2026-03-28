@@ -82,19 +82,7 @@ export default function Home() {
           Solana Devnet, zero-knowledge proofs, and BFT consensus.
         </p>
 
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <Link href="/dashboard" style={{
-            background: '#1d4ed8',
-            color: '#f1f5f9',
-            padding: '16px 32px',
-            borderRadius: '8px',
-            fontWeight: 'bold',
-            fontSize: '16px',
-            textDecoration: 'none'
-          }}>
-            Launch Dashboard
-          </Link>
-        </div>
+
       </main>
 
       {/* Feature Grid */}
