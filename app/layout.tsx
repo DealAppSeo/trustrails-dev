@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import './globals.css';
 
 export const metadata: Metadata = {
   title: 'TrustRails',
@@ -13,7 +12,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body style={{ 
+        background: '#020817', 
+        color: '#f1f5f9', 
+        margin: 0, 
+        padding: 0, 
+        fontFamily: 'system-ui, sans-serif' 
+      }}>
+        {children}
+      </body>
     </html>
   );
 }

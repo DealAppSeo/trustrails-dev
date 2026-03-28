@@ -6,74 +6,121 @@ import { InstitutionalControls } from '@/components/trustrails/InstitutionalCont
 
 export default function Dashboard() {
   return (
-    <div className="min-h-screen bg-[#020817] text-slate-200 font-sans selection:bg-emerald-500/30">
+    <div style={{
+      background: '#020817',
+      color: '#f1f5f9',
+      minHeight: '100vh',
+      padding: '32px',
+      fontFamily: 'system-ui, sans-serif'
+    }}>
       
-      {/* Dynamic Background */}
-      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#020817] to-[#020817] z-0" />
-
-      <div className="relative z-10 p-6 md:p-8 max-w-[1600px] mx-auto">
+      <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
         
         {/* Header Section */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6 border-b border-white/5 pb-6">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-600 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-              <span className="text-white font-bold text-xl">TR</span>
+        <header style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '40px',
+          paddingBottom: '24px',
+          borderBottom: '1px solid #1e293b',
+          flexWrap: 'wrap',
+          gap: '24px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              background: '#1e293b',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 'bold',
+              fontSize: '20px'
+            }}>
+              TR
             </div>
             <div>
-              <h1 className="text-3xl font-extrabold text-white tracking-tight">TrustRails Control Matrix</h1>
-              <p className="text-slate-400 text-sm mt-1">Enterprise Agentic Compliance Gateway</p>
+              <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 'bold' }}>TrustRails Control Matrix</h1>
+              <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#94a3b8' }}>Enterprise Agentic Compliance Gateway</p>
             </div>
           </div>
           
-          <div className="flex gap-3">
-            <a href="/api/trustrails/demo/villain" target="_blank" rel="noreferrer"
-               className="group flex items-center gap-2 bg-red-950/30 text-red-400 border border-red-900/50 rounded-lg px-5 py-2.5 text-sm font-semibold hover:bg-red-900/40 hover:border-red-500/50 transition-all shadow-lg shadow-red-900/10">
-              <span className="group-hover:scale-110 transition-transform">⛔</span> Run Guardrail Demo
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <a href="/api/trustrails/demo/villain" target="_blank" rel="noreferrer" style={{
+              background: '#991b1b',
+              color: '#f1f5f9',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '10px 20px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              ⛔ Run Guardrail Demo
             </a>
-            <a href="/api/trustrails/demo" target="_blank" rel="noreferrer"
-               className="group flex items-center gap-2 bg-emerald-950/30 text-emerald-400 border border-emerald-900/50 rounded-lg px-5 py-2.5 text-sm font-semibold hover:bg-emerald-900/40 hover:border-emerald-500/50 transition-all shadow-lg shadow-emerald-900/10">
-              <span className="group-hover:animate-pulse">⚡</span> Run Compliance Demo
+            <a href="/api/trustrails/demo" target="_blank" rel="noreferrer" style={{
+              background: '#1d4ed8',
+              color: '#f1f5f9',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '10px 20px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              ✅ Run Compliance Demo
             </a>
           </div>
         </header>
 
         {/* System Trust Score */}
-        <div className="mb-10 w-full animate-in fade-in slide-in-from-top-4 duration-700">
+        <div style={{ marginBottom: '40px' }}>
           <SystemTrustScore />
         </div>
 
         {/* Main Grid Layout */}
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 mb-10">
+        <div style={{
+          display: 'flex',
+          gap: '32px',
+          flexWrap: 'wrap',
+          marginBottom: '40px'
+        }}>
           
           {/* Left Column: Controls & Agents */}
-          <div className="xl:col-span-8 flex flex-col gap-8">
-            <div className="bg-slate-900/40 border border-white/5 rounded-2xl p-6 backdrop-blur-xl shadow-xl">
-              <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-blue-500" />
+          <div style={{ flex: '2 1 600px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{ background: '#1e293b', padding: '24px', borderRadius: '12px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 24px 0' }}>
                 Institutional Risk Configuration
               </h2>
               <RiskSlider />
             </div>
             
-            <div className="bg-slate-900/40 border border-white/5 rounded-2xl p-6 backdrop-blur-xl shadow-xl flex-grow">
+            <div style={{ background: '#1e293b', padding: '24px', borderRadius: '12px', flexGrow: 1 }}>
               <AgentRepIDGrid />
             </div>
           </div>
 
           {/* Right Column: Feed & Limits */}
-          <div className="xl:col-span-4 flex flex-col gap-8">
-            <div className="bg-slate-900/40 border border-white/5 rounded-2xl p-6 backdrop-blur-xl shadow-xl">
+          <div style={{ flex: '1 1 400px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{ background: '#1e293b', padding: '24px', borderRadius: '12px' }}>
               <InstitutionalControls institutionId="default" />
             </div>
 
-            <div className="bg-slate-900/40 border border-white/5 rounded-2xl backdrop-blur-xl shadow-xl flex-grow overflow-hidden flex flex-col">
-              <div className="p-6 border-b border-white/5 bg-slate-800/20">
-                <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div style={{ background: '#1e293b', borderRadius: '12px', flexGrow: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '24px', borderBottom: '1px solid #020817' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>
                   Live Compliance Feed
                 </h2>
               </div>
-              <div className="flex-grow">
+              <div style={{ flexGrow: 1 }}>
                 <LiveReceiptFeed />
               </div>
             </div>
@@ -81,11 +128,25 @@ export default function Dashboard() {
         </div>
 
         {/* Footer Badges */}
-        <footer className="flex flex-wrap justify-center gap-4 py-8 border-t border-white/5">
+        <footer style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          gap: '16px',
+          padding: '32px 0',
+          borderTop: '1px solid #1e293b'
+        }}>
           {['MiCA Compliant', 'GENIUS Act Ready', 'FATF Rec. 16 Aligned', 'Fireblocks Pre-Auth', 'AMINA Bank Pilot Ready'].map(label => (
-            <div key={label} className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-              {label}
+            <div key={label} style={{
+              background: '#1e293b',
+              padding: '6px 16px',
+              borderRadius: '24px',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              ✓ {label}
             </div>
           ))}
         </footer>

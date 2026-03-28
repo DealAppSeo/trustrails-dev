@@ -16,10 +16,13 @@ The successful integration between the offline AI agent environment (SOPHIA) and
 - **Role Liability:** Human-Custody Bounded (SBT Validated)
 - **Destination Gateway:** `7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU`
 - **Result:** AUTHORIZED AND SETTLED
-- **Cryptographic Receipt:** `2GmSHCuJeQ9neYqvv9T75q1CSi5cgN7Y6dW7ud3J7anY8NuM7fXYQsYtHt148nCxJboSVn7fqS3i6`
+- **Cryptographic Receipts (Multi-Auth Validation Series):** 
+  - `5cGq5GASDoCnXHouWMpEAnMYot6GETCBihUAJsxP3RqXUHX4HG2KmuhU83THN7jZfojFqf1MWD6QR8AZMVYUkMLT`
+  - `3gqYZNW62Y3Akf1aJyv4XG8o9udr9yVXBqzKMPskaLtKvNiymeiuJiViJxFL2WTYqgQ9EUSixaFjcX2MC1YfWBJ6`
+  - `4pTMxrJ9XsahSox1EiFewiMkiB6JUf2jLzEtgcbrfQ7gC6VQ2pAwKYdqmHcX6LYxnefKseu1PgjbMtthbp7UeAbU`
 
-**Audit this payload natively on Solscan:**
-[Solana Explorer Validation (Devnet)](https://explorer.solana.com/tx/2GmSHCuJeQ9neYqvv9T75q1CSi5cgN7Y6dW7ud3J7anY8NuM7fXYQsYtHt148nCxJboSVn7fqS3i6?cluster=devnet)
+**Audit these payloads natively on Solscan:**
+[Solana Explorer Validation (Devnet)](https://explorer.solana.com/tx/5cGq5GASDoCnXHouWMpEAnMYot6GETCBihUAJsxP3RqXUHX4HG2KmuhU83THN7jZfojFqf1MWD6QR8AZMVYUkMLT?cluster=devnet)
 
 ## 3. Infrastructural Readiness
 - `trustrails-dev` repository is fundamentally detached, hardened, and pushed to GitHub (`DealAppSeo/trustrails-dev`).
