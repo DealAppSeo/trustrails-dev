@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-
+import { SystemTrustScore } from '@/components/trustrails/SystemTrustScore';
+import { AgentRepIDGrid }   from '@/components/trustrails/AgentRepIDGrid';
+import { LiveReceiptFeed }  from '@/components/trustrails/LiveReceiptFeed';
+import { RiskSlider }       from '@/components/trustrails/RiskSlider';
+import { InstitutionalControls } from '@/components/trustrails/InstitutionalControls';
 interface DashData {
   receipts: any[];
   agents: any[];
@@ -526,6 +530,53 @@ export default function Dashboard() {
             </div>
           </div>
         )}
+
+
+        {/* System Trust Score */}
+        <div style={{ marginBottom: '40px' }}>
+          <SystemTrustScore />
+        </div>
+
+        {/* Main Grid Layout */}
+        <div style={{
+          display: 'flex',
+          gap: '32px',
+          flexWrap: 'wrap',
+          marginBottom: '40px'
+        }}>
+          
+          {/* Left Column: Controls & Agents */}
+          <div style={{ flex: '2 1 600px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{ background: '#1e293b', padding: '24px', borderRadius: '12px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 24px 0' }}>
+                Institutional Risk Configuration
+              </h2>
+              <RiskSlider />
+            </div>
+            
+            <div style={{ background: '#1e293b', padding: '24px', borderRadius: '12px', flexGrow: 1 }}>
+              <AgentRepIDGrid />
+            </div>
+          </div>
+
+          {/* Right Column: Feed & Limits */}
+          <div style={{ flex: '1 1 400px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{ background: '#1e293b', padding: '24px', borderRadius: '12px' }}>
+              <InstitutionalControls institutionId="default" />
+            </div>
+
+            <div style={{ background: '#1e293b', borderRadius: '12px', flexGrow: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '24px', borderBottom: '1px solid #020817' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>
+                  Live Compliance Feed
+                </h2>
+              </div>
+              <div style={{ flexGrow: 1 }}>
+                <LiveReceiptFeed />
+              </div>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>
