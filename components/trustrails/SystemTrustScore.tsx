@@ -72,6 +72,9 @@ export function SystemTrustScore() {
       <div style={{ fontSize: 16, color: '#94a3b8', marginTop: 4 }}>
         System Trust Score / 10,000
       </div>
+      <div style={{ fontSize: 13, color: '#64748b', marginTop: 8 }}>
+        BFT Threshold: 66.7% supermajority &middot; 3 LLM providers &middot; Pythagorean Comma Veto active
+      </div>
 
       {/* Status badge */}
       <div style={{

@@ -28,7 +28,7 @@ export interface BFTConsensusProof {
   votesFor:          string[];
   votesAgainst:      string[];
   consensusWeight:   number;    // 0-1
-  threshold:         number;    // 0.618 golden ratio
+  threshold:         number;    // 0.667 supermajority threshold (66.7%)
   passed:            boolean;
   pythagoreanVeto:   boolean;
   votedAt:           string;

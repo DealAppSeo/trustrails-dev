@@ -19,7 +19,7 @@ import { KYAValidator } from './KYAValidator';
 export class BFTAuthorizer {
   private supabase = createClient(_supabaseUrl, _supabaseKey);
   private kya = new KYAValidator();
-  private readonly GOLDEN_RATIO_THRESHOLD = 0.618;
+  private readonly GOLDEN_RATIO_THRESHOLD = 0.667;
 
   async authorize(
     paymentId:     string,

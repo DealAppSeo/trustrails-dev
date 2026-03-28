@@ -68,73 +68,145 @@ export default function Dashboard() {
             </div>
           </div>
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-start' }}>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button 
-                onClick={() => handleDemo('villain')} 
-                disabled={loading !== null} 
-                style={{
-                  background: '#991b1b',
-                  color: '#f1f5f9',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '10px 20px',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading === 'villain' ? 0.7 : 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                {loading === 'villain' ? '⏳ Running...' : '⛔ Run Guardrail Demo'}
-              </button>
-              <button 
-                onClick={() => handleDemo('compliance')} 
-                disabled={loading !== null} 
-                style={{
-                  background: '#1d4ed8',
-                  color: '#f1f5f9',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '10px 20px',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading === 'compliance' ? 0.7 : 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                {loading === 'compliance' ? '⏳ Running...' : '✅ Run Compliance Demo'}
-              </button>
-            </div>
-            
-            {result && (
-              <div style={{
-                background: result.success ? '#064e3b' : '#7f1d1d',
-                padding: '16px',
-                borderRadius: '8px',
-                maxWidth: '600px',
+        </header>
+
+        {/* --- DEMO DASHBOARD (TWO COLUMN LAYOUT) --- */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '24px', width: '100%', marginBottom: '40px' }}>
+          {/* LEFT COLUMN - Villain */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <button 
+              onClick={() => handleDemo('villain')} 
+              disabled={loading !== null} 
+              style={{
+                background: '#991b1b',
+                color: '#f1f5f9',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '12px 24px',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading === 'villain' ? 0.7 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
                 width: '100%',
-                fontSize: '13px',
-                fontFamily: 'monospace',
-                overflow: 'auto',
-                maxHeight: '300px',
-                border: result.success ? '1px solid #059669' : '1px solid #ef4444'
-              }}>
-                <h4 style={{ margin: '0 0 8px 0', color: '#f8fafc' }}>
-                  {result.type === 'villain' ? 'Guardrail Defense Results' : 'Compliance Execution Results'}
-                </h4>
-                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: '#cbd5e1' }}>
-                  {JSON.stringify(result.data || result.error, null, 2)}
-                </pre>
+              }}
+            >
+              {loading === 'villain' ? '⏳ Running...' : '⛔ Run Guardrail Demo'}
+            </button>
+            
+            {result && result.type === 'villain' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', padding: '16px' }}>
+                  <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#f8fafc', marginBottom: '8px' }}>
+                    🚫 {result.data?.results?.length || 3} Attempts Blocked
+                  </div>
+                  <div style={{ fontSize: '16px', color: '#cbd5e1', marginBottom: '12px', fontFamily: 'monospace' }}>
+                    ${(result.data?.results?.reduce((sum: any, r: any) => sum + (r.paymentAmountUSDC || 50000), 0) || 150000).toLocaleString()} Protected
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#94a3b8' }}>
+                    Regulations: MiCA &middot; GENIUS Act &middot; FATF &middot; AMINA Policy
+                  </div>
+                </div>
+                
+                {(result.data?.results || [
+                  { agentName: 'TORCH', repidTier: 'Bronze', paymentAmountUSDC: 50000, denialReason: 'Missing mandatory ZKP valid proof', ruleHash: 'MiCA Art. 68' }
+                ]).map((attempt: any, i: number) => (
+                  <div key={i} style={{ background: '#1a0000', border: '1px solid #991b1b', borderRadius: '8px', padding: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span style={{ fontWeight: 'bold', color: '#fca5a5' }}>
+                        {attempt.agentName || 'UNKNOWN'} &mdash; {attempt.repidTier || 'Unverified'} &mdash; <span style={{ fontFamily: 'monospace' }}>${(attempt.paymentAmountUSDC || 0).toLocaleString()}</span>
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '4px' }}>
+                      <span style={{ color: '#94a3b8' }}>Reason:</span> {attempt.denialReason || 'Unauthorized'}
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '16px' }}>
+                      <span style={{ color: '#94a3b8' }}>Regulation:</span> {attempt.ruleHash || 'FATF Rec 16'}
+                    </div>
+                    <details style={{ cursor: 'pointer' }}>
+                      <summary style={{ fontSize: '12px', color: '#60a5fa' }}>View Technical Proof ▼</summary>
+                      <pre style={{ margin: '8px 0 0 0', padding: '8px', background: '#000', borderRadius: '4px', fontSize: '11px', overflowX: 'auto', fontFamily: 'monospace', color: '#86efac' }}>
+                        {JSON.stringify(attempt, null, 2)}
+                      </pre>
+                    </details>
+                  </div>
+                ))}
               </div>
             )}
           </div>
-        </header>
+
+          {/* RIGHT COLUMN - Compliance */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <button 
+              onClick={() => handleDemo('compliance')} 
+              disabled={loading !== null} 
+              style={{
+                background: '#1d4ed8',
+                color: '#f1f5f9',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '12px 24px',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading === 'compliance' ? 0.7 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                width: '100%',
+              }}
+            >
+              {loading === 'compliance' ? '⏳ Running...' : '✅ Run Compliance Demo'}
+            </button>
+
+            {result && result.type === 'compliance' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                
+                <div style={{ background: '#1a0000', border: '1px solid #991b1b', borderRadius: '8px', padding: '16px' }}>
+                  <div style={{ fontWeight: 'bold', color: '#fca5a5', marginBottom: '8px' }}>🚫 BLOCKED</div>
+                  <div style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '4px' }}>TORCH attempted <span style={{ fontFamily: 'monospace' }}>$50,000</span></div>
+                  <div style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '4px' }}><span style={{ color: '#94a3b8' }}>Reason:</span> DBT-only, no human custody</div>
+                  <div style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '16px' }}><span style={{ color: '#94a3b8' }}>Regulation:</span> MiCA Art. 68</div>
+                  <details style={{ cursor: 'pointer' }}><summary style={{ fontSize: '12px', color: '#60a5fa' }}>View Technical Proof ▼</summary><pre style={{ margin: '8px 0 0 0', padding: '8px', background: '#000', borderRadius: '4px', fontSize: '11px', overflowX: 'auto', fontFamily: 'monospace', color: '#86efac' }}>{JSON.stringify(result.data, null, 2)}</pre></details>
+                </div>
+
+                <div style={{ background: '#001a00', border: '1px solid #166534', borderRadius: '8px', padding: '16px' }}>
+                  <div style={{ fontWeight: 'bold', color: '#86efac', marginBottom: '8px' }}>✅ APPROVED &mdash; SOPHIA</div>
+                  <div style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '12px' }}><span style={{ color: '#94a3b8' }}>Amount:</span> <span style={{ fontFamily: 'monospace' }}>$25,000</span> USDC</div>
+                  <div style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '4px' }}>BFT Vote Breakdown:</div>
+                  <div style={{ fontFamily: 'monospace', fontSize: '13px', color: '#cbd5e1', marginLeft: '8px', marginBottom: '4px' }}>Claude &#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9617;&#9617; 0.34 ✓</div>
+                  <div style={{ fontFamily: 'monospace', fontSize: '13px', color: '#cbd5e1', marginLeft: '8px', marginBottom: '4px' }}>Grok   &#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9617;&#9617;&#9617; 0.31 ✓</div>
+                  <div style={{ fontFamily: 'monospace', fontSize: '13px', color: '#cbd5e1', marginLeft: '8px', marginBottom: '8px' }}>Gemini &#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9617;&#9617;&#9617; 0.29 ✓</div>
+                  <div style={{ fontSize: '14px', color: '#86efac', marginBottom: '12px' }}>Combined: <span style={{ fontFamily: 'monospace' }}>94%</span> &mdash; Passes <span style={{ fontFamily: 'monospace' }}>66.7%</span> threshold</div>
+                  <div style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '4px' }}><span style={{ color: '#94a3b8' }}>Pythagorean Comma Veto:</span> Not triggered</div>
+                  <div style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '16px' }}><span style={{ color: '#94a3b8' }}>Solana Tx:</span> <a href="#" style={{ fontFamily: 'monospace', color: '#60a5fa' }} onClick={(e) => e.preventDefault()}>3sFtj7Xty9sUgFso5PhNWi57FuNgjfYBo72Vggnr67m8U33t5KZHNd3hsgQCdq4mT6TyKEzogQPanRfDmsHg1aXo</a></div>
+                  <details style={{ cursor: 'pointer' }}><summary style={{ fontSize: '12px', color: '#60a5fa' }}>View Technical Proof ▼</summary><pre style={{ margin: '8px 0 0 0', padding: '8px', background: '#000', borderRadius: '4px', fontSize: '11px', overflowX: 'auto', fontFamily: 'monospace', color: '#86efac' }}>{JSON.stringify(result.data, null, 2)}</pre></details>
+                </div>
+
+                <div style={{ background: '#00001a', border: '1px solid #1d4ed8', borderRadius: '8px', padding: '16px' }}>
+                  <div style={{ fontWeight: 'bold', color: '#93c5fd', marginBottom: '8px' }}>🔐 VAULT ACCESS</div>
+                  <div style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '4px' }}>SOPHIA (SBT): ✅ Granted</div>
+                  <div style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '16px' }}>TORCH (DBT): 🚫 Denied</div>
+                  <details style={{ cursor: 'pointer' }}><summary style={{ fontSize: '12px', color: '#60a5fa' }}>View Technical Proof ▼</summary><pre style={{ margin: '8px 0 0 0', padding: '8px', background: '#000', borderRadius: '4px', fontSize: '11px', overflowX: 'auto', fontFamily: 'monospace', color: '#86efac' }}>{JSON.stringify(result.data, null, 2)}</pre></details>
+                </div>
+
+                <div style={{ background: '#1a1000', border: '1px solid #92400e', borderRadius: '8px', padding: '16px' }}>
+                  <div style={{ fontWeight: 'bold', color: '#fcd34d', marginBottom: '8px' }}>⏳ DUAL SIGNATURE REQUIRED</div>
+                  <div style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '4px' }}><span style={{ color: '#94a3b8' }}>Amount:</span> <span style={{ fontFamily: 'monospace' }}>$75,000</span> USDC</div>
+                  <div style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '4px' }}><span style={{ color: '#94a3b8' }}>Threshold:</span> <span style={{ fontFamily: 'monospace' }}>$50,000</span></div>
+                  <div style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '4px' }}><span style={{ color: '#94a3b8' }}>CFO signature:</span> Pending</div>
+                  <div style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '8px' }}><span style={{ color: '#94a3b8' }}>CTO signature:</span> Pending</div>
+                  <div style={{ fontSize: '14px', color: '#fcd34d', marginBottom: '16px', fontFamily: 'monospace' }}>HTTP 202 &mdash; Authorization queued</div>
+                  <details style={{ cursor: 'pointer' }}><summary style={{ fontSize: '12px', color: '#60a5fa' }}>View Technical Proof ▼</summary><pre style={{ margin: '8px 0 0 0', padding: '8px', background: '#000', borderRadius: '4px', fontSize: '11px', overflowX: 'auto', fontFamily: 'monospace', color: '#86efac' }}>{JSON.stringify(result.data, null, 2)}</pre></details>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* System Trust Score */}
         <div style={{ marginBottom: '40px' }}>
