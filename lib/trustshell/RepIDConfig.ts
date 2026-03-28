@@ -3,6 +3,17 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+const _supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const _supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!_supabaseUrl) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL in Vercel Environment');
+}
+if (!_supabaseKey) {
+  throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY or ANON_KEY in Vercel Environment');
+}
+
+
 export interface RepIDWeights {
   bftAccuracy:        number;
   veritasCatchRate:   number;
@@ -28,10 +39,7 @@ export interface RepIDCalculationResult {
 }
 
 export class RepIDCalculator {
-  private supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  );
+  private supabase = createClient(_supabaseUrl, _supabaseKey);
 
   private readonly DEFAULT_WEIGHTS: RepIDWeights = {
     bftAccuracy:        0.40,

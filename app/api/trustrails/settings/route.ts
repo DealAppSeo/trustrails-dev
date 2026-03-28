@@ -2,13 +2,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+const _supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const _supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!_supabaseUrl) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL in Vercel Environment');
+}
+if (!_supabaseKey) {
+  throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY or ANON_KEY in Vercel Environment');
+}
+
+
 export async function GET(req: NextRequest) {
   const institutionId = req.nextUrl.searchParams.get('institution') || 'default';
   
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  );
+  const supabase = createClient(_supabaseUrl, _supabaseKey);
 
   const { data } = await supabase
     .from('institution_config')
@@ -26,10 +34,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  );
+  const supabase = createClient(_supabaseUrl, _supabaseKey);
 
   const { error } = await supabase
     .from('institution_config')

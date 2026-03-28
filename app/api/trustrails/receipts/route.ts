@@ -4,10 +4,18 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const _supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const _supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!_supabaseUrl) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL in Vercel Environment');
+}
+if (!_supabaseKey) {
+  throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY or ANON_KEY in Vercel Environment');
+}
+
+
+const supabase = createClient(_supabaseUrl, _supabaseKey);
 
 export async function GET() {
   const { data } = await supabase

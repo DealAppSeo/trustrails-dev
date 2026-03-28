@@ -6,16 +6,24 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+const _supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const _supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!_supabaseUrl) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL in Vercel Environment');
+}
+if (!_supabaseKey) {
+  throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY or ANON_KEY in Vercel Environment');
+}
+
+
 export async function GET(req: any) {
   const { searchParams } = new URL(req.url);
   if (searchParams.get('key') !== 'trinity') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  );
+  const supabase = createClient(_supabaseUrl, _supabaseKey);
 
   const results = { dbUpdates: {}, sprintReport: {}, registryAudit: 0 };
 
