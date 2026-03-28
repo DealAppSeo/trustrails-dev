@@ -55,7 +55,7 @@ export function AgentRepIDGrid() {
       </h3>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
         {agents.map(agent => {
-          const color = TIER_COLORS[agent.repid_tier] || '#64748b';
+          const color = TIER_COLORS[agent.repid_tier] || '#8b9ab0';
           const pct   = (agent.repid_score / 10000) * 100;
           return (
             <div key={agent.agent_name} style={{
@@ -71,7 +71,7 @@ export function AgentRepIDGrid() {
                 </span>
                 <div>
                   <span style={{
-                    fontSize: 10, fontWeight: 700, color,
+                    fontSize: 13, fontWeight: 700, color,
                     border: `1px solid ${color}`,
                     borderRadius: 4, padding: '2px 6px',
                   }}>
@@ -80,19 +80,19 @@ export function AgentRepIDGrid() {
                   {agent.lifecycle_state === 'EARNING_AUTONOMY' && (
                     <span 
                       title="Approaching autonomous threshold (RepID 9000). Human custodian exposure decreasing. Soon self-custodying — earned through verified behavior."
-                      style={{ background: '#78350f', color: '#fcd34d', fontSize: '10px', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace', marginLeft: '4px' }}
+                      style={{ background: '#78350f', color: '#fcd34d', fontSize: '13px', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace', marginLeft: '4px' }}
                     >📈 EARNING</span>
                   )}
                   {agent.lifecycle_state === 'CUSTODIED_DBT' && (
                     <span 
                       title="Human custodian verified via Zero-Knowledge Proof. Identity proven, never revealed. Satisfies MiCA UBO requirement without exposing identity."
-                      style={{ background: '#1e3a5f', color: '#60a5fa', fontSize: '10px', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace', marginLeft: '4px' }}
+                      style={{ background: '#1e3a5f', color: '#60a5fa', fontSize: '13px', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace', marginLeft: '4px' }}
                     >⛓ CUSTODIED</span>
                   )}
                   {agent.lifecycle_state === 'UNCUSTODIED_DBT' && (
                     <span 
                       title="No human custodian. Agent-only liability. Limited to micro-payments. No vault access. Link a verified human custodian to unlock full capability."
-                      style={{ background: '#1e293b', color: '#64748b', fontSize: '10px', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace', marginLeft: '4px' }}
+                      style={{ background: '#1e293b', color: '#8b9ab0', fontSize: '13px', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace', marginLeft: '4px' }}
                     >💳 DBT</span>
                   )}
                 </div>
@@ -102,7 +102,7 @@ export function AgentRepIDGrid() {
               <div style={{ fontSize: 28, fontWeight: 900, color, marginTop: 8, lineHeight: 1 }}>
                 {Number(agent.repid_score).toLocaleString()}
               </div>
-              <div style={{ fontSize: 10, color: '#64748b' }}>RepID / 10,000</div>
+              <div style={{ fontSize: 13, color: '#8b9ab0' }}>RepID / 10,000</div>
 
               {/* Progress bar */}
               <div style={{ background: '#0f172a', borderRadius: 4, height: 6, marginTop: 10 }}>
@@ -112,16 +112,16 @@ export function AgentRepIDGrid() {
               {/* Badges */}
               <div style={{ marginTop: 10, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                 {agent.human_custody_verified && (
-                  <span style={{ fontSize: 9, background: '#14532d', color: '#86efac', borderRadius: 4, padding: '2px 6px' }}>
+                  <span style={{ fontSize: 13, background: '#14532d', color: '#86efac', borderRadius: 4, padding: '2px 6px' }}>
                     🔐 CUSTODY
                   </span>
                 )}
                 {agent.vault_access_permitted && (
-                  <span style={{ fontSize: 9, background: '#1e3a5f', color: '#93c5fd', borderRadius: 4, padding: '2px 6px' }}>
+                  <span style={{ fontSize: 13, background: '#1e3a5f', color: '#93c5fd', borderRadius: 4, padding: '2px 6px' }}>
                     🏦 VAULT
                   </span>
                 )}
-                <span style={{ fontSize: 9, background: '#1a1a2e', color: '#a78bfa', borderRadius: 4, padding: '2px 6px' }}>
+                <span style={{ fontSize: 13, background: '#1a1a2e', color: '#a78bfa', borderRadius: 4, padding: '2px 6px' }}>
                   🛡️ ${(Number(agent.insurance_coverage)/1000).toFixed(0)}K
                 </span>
               </div>

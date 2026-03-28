@@ -30,18 +30,18 @@ export default function Home() {
             justifyContent: 'center',
             borderRadius: '6px',
             fontWeight: 'bold',
-            fontSize: '14px'
+            fontSize: '15px'
           }}>
             TR
           </div>
           <span style={{ fontSize: '20px', fontWeight: 'bold' }}>TrustRails</span>
         </div>
         <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <Link href="/dashboard" style={{ color: '#f1f5f9', textDecoration: 'none', fontSize: '14px' }}>
+          <Link href="/dashboard" style={{ color: '#f1f5f9', textDecoration: 'none', fontSize: '15px' }}>
             Enter Dashboard
           </Link>
           <a href="https://github.com/DealAppSeo/trustrails-dev" target="_blank" rel="noreferrer" style={{
-            fontSize: '14px',
+            fontSize: '15px',
             padding: '8px 16px',
             border: '1px solid #1e293b',
             borderRadius: '6px',
@@ -65,7 +65,7 @@ export default function Home() {
           background: '#1e293b',
           padding: '6px 16px',
           borderRadius: '24px',
-          fontSize: '12px',
+          fontSize: '13px',
           fontWeight: 'bold',
           marginBottom: '32px'
         }}>
@@ -118,15 +118,15 @@ export default function Home() {
           }}>
             <div style={{ fontSize: '28px', marginBottom: '16px' }}>{feat.icon}</div>
             <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px', margin: '0 0 8px 0' }}>{feat.title}</h3>
-            <p style={{ fontSize: '14px', color: '#94a3b8', lineHeight: '1.6', margin: 0 }}>{feat.desc}</p>
+            <p style={{ fontSize: '15px', color: '#94a3b8', lineHeight: '1.6', margin: 0 }}>{feat.desc}</p>
           </div>
         ))}
       </section>
 
       <div style={{
         textAlign: 'center',
-        fontSize: '12px',
-        color: '#475569',
+        fontSize: '13px',
+        color: '#94a3b8',
         marginTop: '16px',
         fontFamily: 'monospace'
       }}>

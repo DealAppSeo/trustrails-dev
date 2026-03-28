@@ -132,7 +132,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
     setFrozen(true);
   };
 
-  if (!config) return <div style={{ color: '#64748b', padding: 24 }}>Loading controls...</div>;
+  if (!config) return <div style={{ color: '#8b9ab0', padding: 24 }}>Loading controls...</div>;
 
   const currentGroup = CONTROL_GROUPS.find(g => g.id === activeGroup)!;
 
@@ -150,7 +150,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
             <div style={{ color: '#fca5a5', fontWeight: 700, fontSize: 16 }}>
               🔴 ALL AGENT ACTIVITY FROZEN
             </div>
-            <div style={{ color: '#fca5a5', fontSize: 12, marginTop: 4 }}>
+            <div style={{ color: '#fca5a5', fontSize: 13, marginTop: 4 }}>
               Frozen by {config.frozen_by} at {config.frozen_at
                 ? new Date(config.frozen_at).toLocaleString() : 'unknown'}.
               Dual-sig required to unfreeze.
@@ -165,7 +165,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
           <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>
             🏛️ Institutional Control Matrix
           </h2>
-          <p style={{ color: '#64748b', fontSize: 12, marginTop: 4 }}>
+          <p style={{ color: '#8b9ab0', fontSize: 13, marginTop: 4 }}>
             You set every threshold. We enforce every rule cryptographically.
             All changes are permanently logged with approver signature.
           </p>
@@ -175,7 +175,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
             style={{
               background: '#7f1d1d', color: '#fca5a5',
               border: '1px solid #991b1b', borderRadius: 8,
-              padding: '8px 16px', fontSize: 12, cursor: 'pointer',
+              padding: '8px 16px', fontSize: 13, cursor: 'pointer',
             }}>
             🔴 Emergency Freeze
           </button>
@@ -184,7 +184,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
 
       {/* Regulatory profile quick-select */}
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>
+        <div style={{ fontSize: 13, color: '#8b9ab0', marginBottom: 8 }}>
           Regulatory Profile — one click switches all compliance rules
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -195,8 +195,8 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
               style={{
                 background: config.regulatory_profile === profile.id ? '#1d4ed8' : '#1e293b',
                 color:      config.regulatory_profile === profile.id ? '#fff' : '#94a3b8',
-                border:     `1px solid ${config.regulatory_profile === profile.id ? '#3b82f6' : '#334155'}`,
-                borderRadius: 6, padding: '4px 12px', fontSize: 11, cursor: 'pointer',
+                border:     `1px solid ${config.regulatory_profile === profile.id ? '#3b82f6' : '#64748b'}`,
+                borderRadius: 6, padding: '4px 12px', fontSize: 13, cursor: 'pointer',
               }}>
               {profile.label}
             </button>
@@ -211,9 +211,9 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
             onClick={() => setGroup(group.id)}
             style={{
               background:  activeGroup === group.id ? '#1e3a5f' : '#1e293b',
-              color:       activeGroup === group.id ? '#93c5fd' : '#64748b',
-              border:      `1px solid ${activeGroup === group.id ? '#3b82f6' : '#334155'}`,
-              borderRadius: 8, padding: '6px 14px', fontSize: 12, cursor: 'pointer',
+              color:       activeGroup === group.id ? '#93c5fd' : '#8b9ab0',
+              border:      `1px solid ${activeGroup === group.id ? '#3b82f6' : '#64748b'}`,
+              borderRadius: 8, padding: '6px 14px', fontSize: 13, cursor: 'pointer',
             }}>
             {group.label}
           </button>
@@ -223,7 +223,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
       {/* Persona label */}
       <div style={{
         background: '#1e293b', borderRadius: 8, padding: '8px 14px',
-        marginBottom: 16, fontSize: 12, color: '#94a3b8',
+        marginBottom: 16, fontSize: 13, color: '#94a3b8',
       }}>
         Controls for: <span style={{ color: '#f1f5f9', fontWeight: 600 }}>{currentGroup.persona}</span>
       </div>
@@ -234,7 +234,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
           <div key={control.key} style={{
             background: '#1e293b', borderRadius: 10, padding: 16,
           }}>
-            <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 6 }}>{control.label}</div>
+            <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 6 }}>{control.label}</div>
 
             {control.type === 'toggle' && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -242,7 +242,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
                   onClick={() => setConfig((c: any) => ({ ...c, [control.key]: !c[control.key] }))}
                   style={{
                     width: 48, height: 26, borderRadius: 13,
-                    background: config[control.key] ? '#22c55e' : '#334155',
+                    background: config[control.key] ? '#22c55e' : '#64748b',
                     cursor: 'pointer', position: 'relative', flexShrink: 0,
                   }}>
                   <div style={{
@@ -251,7 +251,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
                     left: config[control.key] ? 24 : 4, transition: 'left 0.2s',
                   }} />
                 </div>
-                <span style={{ color: config[control.key] ? '#22c55e' : '#64748b', fontSize: 13 }}>
+                <span style={{ color: config[control.key] ? '#22c55e' : '#8b9ab0', fontSize: 14 }}>
                   {config[control.key] ? 'Enabled' : 'Disabled'}
                 </span>
               </div>
@@ -259,18 +259,18 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
 
             {control.type === 'currency' && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ color: '#64748b', fontSize: 14 }}>$</span>
+                <span style={{ color: '#8b9ab0', fontSize: 15 }}>$</span>
                 <input
                   type="number"
                   value={config[control.key] || 0}
                   onChange={e => setConfig((c: any) => ({ ...c, [control.key]: Number(e.target.value) }))}
                   style={{
-                    background: '#0f172a', border: '1px solid #334155',
+                    background: '#0f172a', border: '1px solid #64748b',
                     borderRadius: 6, padding: '6px 12px', color: '#f1f5f9',
                     fontSize: 16, fontWeight: 700, width: 160,
                   }}
                 />
-                <span style={{ color: '#64748b', fontSize: 12 }}>USDC</span>
+                <span style={{ color: '#8b9ab0', fontSize: 13 }}>USDC</span>
               </div>
             )}
 
@@ -294,8 +294,8 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
                 value={config[control.key] || ''}
                 onChange={e => setConfig((c: any) => ({ ...c, [control.key]: e.target.value }))}
                 style={{
-                  background: '#0f172a', border: '1px solid #334155',
-                  borderRadius: 6, padding: '6px 12px', color: '#f1f5f9', fontSize: 13,
+                  background: '#0f172a', border: '1px solid #64748b',
+                  borderRadius: 6, padding: '6px 12px', color: '#f1f5f9', fontSize: 14,
                 }}>
                 {((control as any).options || []).map((opt: any) => (
                   <option key={opt.id} value={opt.id}>{opt.label}</option>
@@ -312,11 +312,11 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
           style={{
             background: saved ? '#22c55e' : '#1d4ed8',
             color: '#fff', border: 'none', borderRadius: 10,
-            padding: '12px 32px', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+            padding: '12px 32px', fontSize: 15, fontWeight: 700, cursor: 'pointer',
           }}>
           {saving ? 'Saving...' : saved ? '✓ Saved to Institution Config' : 'Save Controls'}
         </button>
-        <span style={{ color: '#475569', fontSize: 11 }}>
+        <span style={{ color: '#94a3b8', fontSize: 13 }}>
           Logged to immutable audit trail with timestamp
         </span>
       </div>
@@ -324,7 +324,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
       {/* Compliance footer */}
       <div style={{
         marginTop: 20, padding: 12, background: '#0f172a', borderRadius: 8,
-        fontSize: 11, color: '#475569', borderTop: '1px solid #1e293b',
+        fontSize: 13, color: '#94a3b8', borderTop: '1px solid #1e293b',
         lineHeight: 1.6,
       }}>
         All controls enforced cryptographically before any agent action executes.

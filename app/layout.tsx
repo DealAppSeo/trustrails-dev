@@ -23,8 +23,8 @@ export default function RootLayout({
         <footer style={{
           textAlign: 'center',
           padding: '16px',
-          fontSize: '11px',
-          color: '#334155',
+          fontSize: '12px',
+          color: '#64748b',
           borderTop: '1px solid #1e293b',
           fontFamily: 'monospace'
         }}>

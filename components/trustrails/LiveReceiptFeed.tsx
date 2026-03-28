@@ -47,7 +47,7 @@ export function LiveReceiptFeed() {
       </h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: '600px', overflowY: 'auto' }}>
         {receipts.length === 0 ? (
-          <div style={{ color: '#64748b', fontSize: 13 }}>No receipts found.</div>
+          <div style={{ color: '#8b9ab0', fontSize: 14 }}>No receipts found.</div>
         ) : (
           receipts.map(r => (
             <div key={r.receipt_id} style={{
@@ -55,7 +55,7 @@ export function LiveReceiptFeed() {
               borderLeft: `4px solid ${r.bft_passed ? '#22c55e' : '#ef4444'}`,
               borderRadius: 8,
               padding: 16,
-              fontSize: 13,
+              fontSize: 14,
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                 <span style={{ color: '#f8fafc', fontWeight: 600 }}>{r.agent_name}</span>
@@ -70,8 +70,8 @@ export function LiveReceiptFeed() {
               {/* Custodian liability line */}
               <div style={{ marginBottom: 8 }}>
                 <span style={{
-                  fontSize: '11px',
-                  color: '#64748b',
+                  fontSize: '13px',
+                  color: '#8b9ab0',
                   fontFamily: 'monospace'
                 }}>
                   {r.custodian_link_active
@@ -82,16 +82,16 @@ export function LiveReceiptFeed() {
               </div>
 
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                <span style={{ background: '#0f172a', padding: '2px 6px', borderRadius: 4, color: '#e2e8f0', fontSize: 11 }}>
+                <span style={{ background: '#0f172a', padding: '2px 6px', borderRadius: 4, color: '#e2e8f0', fontSize: 13 }}>
                   RepID: {r.agent_repid_score}
                 </span>
                 {r.fireblocks_preauth_id && (
-                  <span style={{ background: '#0f172a', padding: '2px 6px', borderRadius: 4, color: '#38bdf8', fontSize: 11 }}>
+                  <span style={{ background: '#0f172a', padding: '2px 6px', borderRadius: 4, color: '#38bdf8', fontSize: 13 }}>
                     {r.fireblocks_preauth_id}
                   </span>
                 )}
                 {r.solana_tx_hash && (
-                  <span style={{ background: '#0f172a', padding: '2px 6px', borderRadius: 4, color: '#a78bfa', fontSize: 11 }}>
+                  <span style={{ background: '#0f172a', padding: '2px 6px', borderRadius: 4, color: '#a78bfa', fontSize: 13 }}>
                     Tx: {r.solana_tx_hash.slice(0, 8)}...
                   </span>
                 )}

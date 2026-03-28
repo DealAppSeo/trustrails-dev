@@ -72,7 +72,7 @@ export function SystemTrustScore() {
       <div style={{ fontSize: 16, color: '#94a3b8', marginTop: 4 }}>
         System Trust Score / 10,000
       </div>
-      <div style={{ fontSize: 13, color: '#64748b', marginTop: 8 }}>
+      <div style={{ fontSize: 14, color: '#8b9ab0', marginTop: 8 }}>
         BFT Threshold: 66.7% supermajority &middot; 3 LLM providers &middot; Pythagorean Comma Veto active
       </div>
 
@@ -84,7 +84,7 @@ export function SystemTrustScore() {
         borderRadius: 8,
         padding: '6px 20px',
         marginTop: 16,
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: 700,
         color: scoreColor,
         letterSpacing: 2,
@@ -92,7 +92,7 @@ export function SystemTrustScore() {
         {data.status}
       </div>
 
-      <p style={{ color: '#94a3b8', fontSize: 13, marginTop: 12 }}>
+      <p style={{ color: '#94a3b8', fontSize: 14, marginTop: 12 }}>
         {data.tagline}
       </p>
 
@@ -108,7 +108,7 @@ export function SystemTrustScore() {
         ].map(m => (
           <div key={m.label} style={{ textAlign: 'center', minWidth: 80 }}>
             <div style={{ fontSize: 22, fontWeight: 700, color: '#f1f5f9' }}>{m.value}</div>
-            <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>{m.label}</div>
+            <div style={{ fontSize: 13, color: '#8b9ab0', marginTop: 2 }}>{m.label}</div>
           </div>
         ))}
       </div>
@@ -122,7 +122,7 @@ export function SystemTrustScore() {
               color: val ? '#86efac' : '#fca5a5',
               borderRadius: 6,
               padding: '3px 10px',
-              fontSize: 11,
+              fontSize: 13,
               fontWeight: 600,
             }}>
               {val ? '✓' : '✗'} {key.replace(/([A-Z])/g, ' $1').trim()}
@@ -138,7 +138,7 @@ export function SystemTrustScore() {
           border: '1px solid #3b82f6',
           borderRadius: 8,
           padding: '8px 16px',
-          fontSize: 12,
+          fontSize: 13,
           color: '#93c5fd',
         }}>
           🏦 AMINA Bank Pilot Ready — System trust score exceeds institutional threshold

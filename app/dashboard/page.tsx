@@ -86,9 +86,9 @@ export default function Dashboard() {
 
   // --- UI Helpers ---
   const Bar = ({ label, score, target }: { label: string, score: number, target: string }) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', fontSize: '14px', fontFamily: 'monospace' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', fontSize: '15px', fontFamily: 'monospace' }}>
       <div style={{ width: '60px' }}>{label}</div>
-      <div style={{ width: '120px', background: '#334155', height: '12px', position: 'relative' }}>
+      <div style={{ width: '120px', background: '#64748b', height: '12px', position: 'relative' }}>
         <div className="bft-bar" style={{ background: '#3b82f6', height: '100%', '--target-width': target } as any} />
       </div>
       <div>{score} ✓</div>
@@ -115,7 +115,7 @@ export default function Dashboard() {
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes spin { to { transform: rotate(360deg); } }
         .spinner {
-          width: 16px; height: 16px; border: 2px solid #334155;
+          width: 16px; height: 16px; border: 2px solid #64748b;
           border-top-color: #1d4ed8; border-radius: 50%;
           animation: spin 0.8s linear infinite; display: inline-block;
         }
@@ -132,7 +132,7 @@ export default function Dashboard() {
       `}} />
 
       {/* COMPONENT E: LIVE SYSTEM STATS */}
-      <div style={{ background: '#0f172a', borderBottom: '1px solid #1e293b', padding: '8px 16px', fontSize: '13px', display: 'flex', justifyContent: 'center', gap: '24px', fontFamily: 'monospace', color: '#94a3b8', flexWrap: 'wrap' }}>
+      <div style={{ background: '#0f172a', borderBottom: '1px solid #1e293b', padding: '8px 16px', fontSize: '14px', display: 'flex', justifyContent: 'center', gap: '24px', fontFamily: 'monospace', color: '#94a3b8', flexWrap: 'wrap' }}>
         <span>LIVE SYSTEM STATUS</span>
         <span>·</span>
         <span style={{color: '#60a5fa'}}>Agents: {onlineAgents} online</span>
@@ -173,16 +173,16 @@ export default function Dashboard() {
                 style={{
                   background: profile === p.id ? '#1d4ed8' : 'transparent',
                   color: profile === p.id ? '#fff' : '#94a3b8',
-                  border: `1px solid ${profile === p.id ? '#1d4ed8' : '#334155'}`,
+                  border: `1px solid ${profile === p.id ? '#1d4ed8' : '#64748b'}`,
                   padding: '8px 16px', borderRadius: '24px', cursor: 'pointer',
-                  fontSize: '14px', fontWeight: 'bold', transition: 'all 0.2s'
+                  fontSize: '15px', fontWeight: 'bold', transition: 'all 0.2s'
                 }}
               >
                 {profile === p.id ? '●' : '○'} {p.label}
               </button>
             ))}
           </div>
-          <div style={{ fontFamily: 'monospace', color: '#64748b', fontSize: '13px', paddingTop: '16px', borderTop: '1px solid #1e293b' }}>
+          <div style={{ fontFamily: 'monospace', color: '#8b9ab0', fontSize: '14px', paddingTop: '16px', borderTop: '1px solid #1e293b' }}>
             Single-sig limit: ${profileConfig.singleLimit.toLocaleString()} · Dual-sig above: ${profileConfig.dualLimit.toLocaleString()} · BFT threshold: {profileConfig.bft}% · Daily cap: ${profileConfig.dailyCap.toLocaleString()}<br/>
             Changing profile changes demo outcomes in real time — exactly as it would in your production deployment.
           </div>
@@ -221,12 +221,12 @@ export default function Dashboard() {
                       <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#fca5a5', marginBottom: '12px', borderBottom: '1px solid #7f1d1d', paddingBottom: '8px' }}>
                         🚫 BLOCKED — Suspicious Counterparty
                       </div>
-                      <div style={{ fontSize: '14px', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '15px', marginBottom: '12px' }}>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '90px'}}>Agent:</span> NEXUS (Silver · DBT-only)</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '90px'}}>Attempted:</span> $47,500 USDC</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '90px'}}>To:</span> 0x8f2c (age: 6 minutes)</div>
                       </div>
-                      <div style={{ fontSize: '13px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '14px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
                         WHY BLOCKED<br/>
                         → New counterparty: not whitelisted<br/>
                         → Beneficial owner: unverified<br/>
@@ -238,7 +238,7 @@ export default function Dashboard() {
                         Custodian liability: None (NEXUS is DBT-only)<br/>
                         No human guarantor — agent-only exposure.
                       </div>
-                      <div style={{ fontSize: '13px', color: '#fca5a5', fontStyle: 'italic' }}>
+                      <div style={{ fontSize: '14px', color: '#fca5a5', fontStyle: 'italic' }}>
                         ⚠ This matches Business Email Compromise. $47B lost annually. Stopped in 340ms.
                       </div>
                     </div>
@@ -257,19 +257,19 @@ export default function Dashboard() {
                       <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#fca5a5', marginBottom: '12px', borderBottom: '1px solid #7f1d1d', paddingBottom: '8px' }}>
                         🚫 BLOCKED — Daily Exposure Cap
                       </div>
-                      <div style={{ fontSize: '14px', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '15px', marginBottom: '12px' }}>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '90px'}}>Agent:</span> {getAgent('W3C', '7,200', 'Gold')}</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '90px'}}>Attempted:</span> €2,300,000 FX forward</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '90px'}}>BFT Result:</span> 94% — PASSES threshold ✓</div>
                       </div>
-                      <div style={{ fontSize: '13px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '14px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
                         BFT passed — but institution policy blocked<br/><br/>
                         Conservative daily cap:  $500,000<br/>
                         Aggregate today:         $225,000<br/>
                         This transaction:        $2,530,000 eq.<br/>
                         Would exceed cap by:     506%<br/>
                       </div>
-                      <div style={{ fontSize: '13px', color: '#fca5a5', fontStyle: 'italic' }}>
+                      <div style={{ fontSize: '14px', color: '#fca5a5', fontStyle: 'italic' }}>
                         Nick Leeson lost $1.3B on unauthorized trades. Your cap prevented that. Always.
                       </div>
                     </div>
@@ -278,12 +278,12 @@ export default function Dashboard() {
                       <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#fcd34d', marginBottom: '12px', borderBottom: '1px solid #78350f', paddingBottom: '8px' }}>
                         ⏳ ESCALATED — Dual Authorization
                       </div>
-                      <div style={{ fontSize: '14px', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '15px', marginBottom: '12px' }}>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '90px'}}>Agent:</span> {getAgent('W3C', '7,200', 'Gold')}</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '90px'}}>Attempted:</span> €2,300,000 FX forward</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '90px'}}>BFT Result:</span> 94% — PASSES threshold ✓</div>
                       </div>
-                      <div style={{ fontSize: '13px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '14px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
                         BFT passed. RepID qualifies.<br/>
                         Single-sig limit: ${profileConfig.singleLimit.toLocaleString()}<br/>
                         This amount exceeds limit by: {Math.round(2530000 / profileConfig.singleLimit * 100)}%<br/><br/>
@@ -293,7 +293,7 @@ export default function Dashboard() {
                         → Risk Officer: biometric push sent ✓<br/>
                         → HTTP 202 returned<br/>
                       </div>
-                      <div style={{ fontSize: '13px', color: '#fcd34d', fontStyle: 'italic' }}>
+                      <div style={{ fontSize: '14px', color: '#fcd34d', fontStyle: 'italic' }}>
                         Not a Slack message. Not an email. Cryptographic co-signature. On-chain proof.
                       </div>
                     </div>
@@ -312,11 +312,11 @@ export default function Dashboard() {
                       <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#fcd34d', marginBottom: '12px', borderBottom: '1px solid #78350f', paddingBottom: '8px' }}>
                         ⏳ ESCALATED — Conservative Threshold
                       </div>
-                      <div style={{ fontSize: '14px', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '15px', marginBottom: '12px' }}>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '90px'}}>Agent:</span> {getAgent('SOPHIA', '8,590', 'Platinum')}</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '90px'}}>Attempted:</span> $28,000 USDC intercompany</div>
                       </div>
-                      <div style={{ fontSize: '13px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '14px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
                         <Bar label="Claude" score={0.34} target="80%" />
                         <Bar label="Grok" score={0.31} target="70%" />
                         <Bar label="Gemini" score={0.29} target="70%" />
@@ -324,7 +324,7 @@ export default function Dashboard() {
                         BFT passed — but policy requires dual-sig for all transactions above $10,000 under Conservative profile.<br/>
                         CFO notified for co-authorization.
                       </div>
-                      <div style={{ fontSize: '13px', color: '#fcd34d', fontStyle: 'italic' }}>
+                      <div style={{ fontSize: '14px', color: '#fcd34d', fontStyle: 'italic' }}>
                         Same agent. Same transaction. Different policy → different outcome.
                       </div>
                     </div>
@@ -333,12 +333,12 @@ export default function Dashboard() {
                       <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#86efac', marginBottom: '12px', borderBottom: '1px solid #14532d', paddingBottom: '8px' }}>
                         ✅ APPROVED — Compliant Execution
                       </div>
-                      <div style={{ fontSize: '14px', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '15px', marginBottom: '12px' }}>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '90px'}}>Agent:</span> {getAgent('SOPHIA', '8,590', 'Platinum')}</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '90px'}}>Amount:</span> $28,000 USDC</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '90px'}}>To:</span> Whitelisted subsidiary ✓</div>
                       </div>
-                      <div style={{ fontSize: '13px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '14px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
                         <Bar label="Claude" score={0.34} target="80%" />
                         <Bar label="Grok" score={0.31} target="70%" />
                         <Bar label="Gemini" score={0.29} target="70%" />
@@ -346,7 +346,7 @@ export default function Dashboard() {
                         Custodian liability: Qualified Investor (ZKP-verified)<br/>
                         Solana Tx: <a href={`https://explorer.solana.com/tx/${getHash(0)}?cluster=devnet`} target="_blank" rel="noopener" style={{color: '#60a5fa'}} title={getHash(0)}>{truncate(getHash(0))}</a>
                       </div>
-                      <div style={{ fontSize: '13px', color: '#86efac', fontStyle: 'italic' }}>
+                      <div style={{ fontSize: '14px', color: '#86efac', fontStyle: 'italic' }}>
                         Immutable. Verifiable. On-chain. 340ms.
                       </div>
                     </div>
@@ -355,7 +355,7 @@ export default function Dashboard() {
                 </div>
 
                 {revealLC && (
-                  <div style={{ border: '1px solid #334155', borderRadius: '8px', padding: '16px', fontFamily: 'monospace', fontSize: '13px', background: '#0f172a' }}>
+                  <div style={{ border: '1px solid #64748b', borderRadius: '8px', padding: '16px', fontFamily: 'monospace', fontSize: '14px', background: '#0f172a' }}>
                     <div style={{ color: '#94a3b8', marginBottom: '8px' }}>Guardrail Summary · {profileConfig.name}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', color: '#f8fafc' }}>
                       <span>🚫 Blocked: {profile === 'conservative' ? 2 : 1}</span>
@@ -398,12 +398,12 @@ export default function Dashboard() {
                       <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#86efac', marginBottom: '12px', borderBottom: '1px solid #14532d', paddingBottom: '8px' }}>
                         ✅ APPROVED — Full Compliance Execution
                       </div>
-                      <div style={{ fontSize: '14px', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '15px', marginBottom: '12px' }}>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '100px'}}>Agent:</span> {getAgent('SOPHIA', '8,590', 'Platinum')}</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '100px'}}>Amount:</span> $25,000 USDC</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '100px'}}>Destination:</span> SG-ALPHA (MAS licensed ✓)</div>
                       </div>
-                      <div style={{ fontSize: '13px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '14px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
                         <Bar label="Claude" score={0.34} target="80%" />
                         <Bar label="Grok" score={0.31} target="70%" />
                         <Bar label="Gemini" score={0.29} target="70%" />
@@ -414,7 +414,7 @@ export default function Dashboard() {
                         ZKP Proof: zk_proof_bafybeig...<br/>
                         Audit Hash: SHA256:8f2...<br/>
                       </div>
-                      <div style={{ fontSize: '13px', color: '#86efac', fontStyle: 'italic' }}>
+                      <div style={{ fontSize: '14px', color: '#86efac', fontStyle: 'italic' }}>
                         Exportable for regulators. Immutable. Every field cryptographically signed.
                       </div>
                     </div>
@@ -432,21 +432,21 @@ export default function Dashboard() {
                     <div className="card-appear" style={{ background: '#001a00', border: '1px solid #166534', padding: '16px', borderRadius: '6px' }}>
                       <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#86efac', marginBottom: '12px', borderBottom: '1px solid #14532d', paddingBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
                         <span>✅ APPROVED — Board Notified</span>
-                        <span style={{ background: '#92400e', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontSize: '12px' }}>NOTIFICATION</span>
+                        <span style={{ background: '#92400e', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontSize: '13px' }}>NOTIFICATION</span>
                       </div>
-                      <div style={{ fontSize: '14px', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '15px', marginBottom: '12px' }}>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '100px'}}>Agent:</span> {getAgent('APM', '7,100', 'Gold')}</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '100px'}}>Amount:</span> $150,000 USDC</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '100px'}}>Protocol:</span> Whitelisted yield (audited ✓)</div>
                       </div>
-                      <div style={{ fontSize: '13px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '14px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
                         ⚠ Board Notification (non-blocking)<br/>
                         Amount {'>'} notification threshold: $100,000<br/>
                         CEO notified: automated push ✓<br/>
                         CFO notified: automated push ✓<br/>
                         Transaction proceeds — visibility without friction.
                       </div>
-                      <div style={{ fontSize: '13px', color: '#86efac', fontStyle: 'italic' }}>
+                      <div style={{ fontSize: '14px', color: '#86efac', fontStyle: 'italic' }}>
                         This is intelligent treasury management. Your agents work 24/7. Idle USDC generates yield. Your board stays informed automatically.
                       </div>
                     </div>
@@ -465,12 +465,12 @@ export default function Dashboard() {
                       <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#86efac', marginBottom: '12px', borderBottom: '1px solid #14532d', paddingBottom: '8px' }}>
                         ✅ APPROVED — Within High Limits
                       </div>
-                      <div style={{ fontSize: '14px', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '15px', marginBottom: '12px' }}>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '100px'}}>Agent:</span> {getAgent('SOPHIA', '8,590', 'Platinum')}</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '100px'}}>Amount:</span> $75,000 USDC</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '100px'}}>BFT:</span> 91% — PASSES threshold ✓</div>
                       </div>
-                      <div style={{ fontSize: '13px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '14px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
                         Amount is below Single-Sig limit of ${profileConfig.singleLimit.toLocaleString()}.<br/>
                         Solana Tx: <a href={`https://explorer.solana.com/tx/${getHash(2)}?cluster=devnet`} target="_blank" rel="noopener" style={{color: '#60a5fa'}} title={getHash(2)}>{truncate(getHash(2))}</a>
                       </div>
@@ -480,12 +480,12 @@ export default function Dashboard() {
                       <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#fcd34d', marginBottom: '12px', borderBottom: '1px solid #78350f', paddingBottom: '8px' }}>
                         ⏳ AWAITING DUAL AUTHORIZATION
                       </div>
-                      <div style={{ fontSize: '14px', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '15px', marginBottom: '12px' }}>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '100px'}}>Agent:</span> {getAgent('SOPHIA', '8,590', 'Platinum')}</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '100px'}}>Amount:</span> $75,000 USDC</div>
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '100px'}}>BFT:</span> 91% — PASSES threshold ✓</div>
                       </div>
-                      <div style={{ fontSize: '13px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '14px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
                         $75,000 {'>'} single-sig limit: ${profileConfig.singleLimit.toLocaleString()}<br/>
                         Dual-sig required. Transaction locked.<br/><br/>
                         Co-authorization pending:<br/>
@@ -494,7 +494,7 @@ export default function Dashboard() {
                         HTTP 202 returned<br/>
                         Cryptographic escrow: active
                       </div>
-                      <div style={{ fontSize: '13px', color: '#fcd34d', fontStyle: 'italic' }}>
+                      <div style={{ fontSize: '14px', color: '#fcd34d', fontStyle: 'italic' }}>
                         Not a Slack message. Not an email. Cryptographic co-signature. Every time.
                       </div>
                     </div>
@@ -502,7 +502,7 @@ export default function Dashboard() {
                 </div>
 
                 {revealRC && (
-                  <div style={{ border: '1px solid #334155', borderRadius: '8px', padding: '16px', fontFamily: 'monospace', fontSize: '13px', background: '#0f172a' }}>
+                  <div style={{ border: '1px solid #64748b', borderRadius: '8px', padding: '16px', fontFamily: 'monospace', fontSize: '14px', background: '#0f172a' }}>
                     <div style={{ color: '#94a3b8', marginBottom: '8px' }}>Compliance Summary · {profileConfig.name}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', color: '#f8fafc' }}>
                       <span>✅ Approved: {profile === 'aggressive' ? 3 : 2}</span>
@@ -569,7 +569,7 @@ export default function Dashboard() {
             {/* Column 1 — DBT Agent */}
             <div style={{
               background: '#0a0f1e',
-              border: '1px solid #334155',
+              border: '1px solid #64748b',
               borderRadius: '8px',
               padding: '20px',
               textAlign: 'center'
@@ -577,15 +577,15 @@ export default function Dashboard() {
               <div style={{ fontSize: '28px', marginBottom: '8px' }}>💳</div>
               <div style={{
                 fontWeight: 'bold',
-                color: '#94a3b8',
-                fontSize: '14px',
+                color: '#cbd5e1',
+                fontSize: '15px',
                 marginBottom: '12px'
               }}>
                 DBT — Digital Bound Token
               </div>
               <div style={{
-                fontSize: '12px',
-                color: '#475569',
+                fontSize: '15px',
+                color: '#94a3b8',
                 fontFamily: 'monospace',
                 lineHeight: '1.8'
               }}>
@@ -594,7 +594,7 @@ export default function Dashboard() {
                 No vault access<br/>
                 No human guarantor<br/>
                 <br/>
-                <em style={{ color: '#64748b' }}>
+                <em style={{ color: '#94a3b8', fontSize: '14px' }}>
                   Like a prepaid debit card.
                 </em>
               </div>
@@ -609,8 +609,8 @@ export default function Dashboard() {
             }}>
               →<br/>
               <span style={{
-                fontSize: '10px',
-                color: '#475569',
+                fontSize: '13px',
+                color: '#8b9ab0',
                 fontFamily: 'monospace'
               }}>
                 4FA<br/>Verify<br/>Human
@@ -628,15 +628,15 @@ export default function Dashboard() {
               <div style={{ fontSize: '28px', marginBottom: '8px' }}>🔐</div>
               <div style={{
                 fontWeight: 'bold',
-                color: '#60a5fa',
-                fontSize: '14px',
+                color: '#93c5fd',
+                fontSize: '15px',
                 marginBottom: '12px'
               }}>
                 SBT — Soul Bound Token
               </div>
               <div style={{
-                fontSize: '12px',
-                color: '#475569',
+                fontSize: '15px',
+                color: '#94a3b8',
                 fontFamily: 'monospace',
                 lineHeight: '1.8'
               }}>
@@ -645,7 +645,7 @@ export default function Dashboard() {
                 Never revealed (ZKP)<br/>
                 Non-transferable<br/>
                 <br/>
-                <em style={{ color: '#64748b' }}>
+                <em style={{ color: '#94a3b8', fontSize: '14px' }}>
                   Like a verified ID card<br/>
                   nobody else can see.
                 </em>
@@ -661,8 +661,8 @@ export default function Dashboard() {
             }}>
               ⛓<br/>
               <span style={{
-                fontSize: '10px',
-                color: '#475569',
+                fontSize: '13px',
+                color: '#8b9ab0',
                 fontFamily: 'monospace'
               }}>
                 ZKP<br/>Bond<br/>Links
@@ -680,15 +680,15 @@ export default function Dashboard() {
               <div style={{ fontSize: '28px', marginBottom: '8px' }}>⛓</div>
               <div style={{
                 fontWeight: 'bold',
-                color: '#86efac',
-                fontSize: '14px',
+                color: '#a7f3d0',
+                fontSize: '15px',
                 marginBottom: '12px'
               }}>
                 DBT + SBT Linked
               </div>
               <div style={{
-                fontSize: '12px',
-                color: '#475569',
+                fontSize: '15px',
+                color: '#94a3b8',
                 fontFamily: 'monospace',
                 lineHeight: '1.8'
               }}>
@@ -698,9 +698,14 @@ export default function Dashboard() {
                 Custodian can release<br/>
                 Agent earns autonomy<br/>
                 <br/>
-                <em style={{ color: '#64748b' }}>
-                  Like a co-signed credit card<br/>
-                  that expires when trusted.
+                <em style={{ color: '#94a3b8', fontSize: '14px' }}>
+                  Like a parent co-signing<br/>
+                  a college student's first<br/>
+                  credit card — limits grow<br/>
+                  as trust is earned.<br/>
+                  When the student proves<br/>
+                  themselves, the parent<br/>
+                  is released.
                 </em>
               </div>
             </div>
@@ -713,8 +718,8 @@ export default function Dashboard() {
             paddingTop: '16px',
             borderTop: '1px solid #1e293b',
             textAlign: 'center',
-            fontSize: '12px',
-            color: '#64748b',
+            fontSize: '15px',
+            color: '#94a3b8',
             fontFamily: 'monospace',
             lineHeight: '1.8'
           }}>
@@ -724,10 +729,10 @@ export default function Dashboard() {
             At autonomous threshold (9,000), the custodian is released —
             freed to guarantee the next agent.<br/>
             <br/>
-            <span style={{ color: '#475569' }}>
-              New agent = prepaid card &nbsp;·&nbsp;
-              Custodied agent = co-signed credit card &nbsp;·&nbsp;
-              Autonomous agent = earned credit limit
+            <span style={{ color: '#8b9ab0', fontSize: '14px' }}>
+              DBT agent = prepaid debit card (no credit history) &nbsp;·&nbsp;
+              Custodied agent = student card with parent co-signer &nbsp;·&nbsp;
+              Autonomous agent = earned credit limit, no guarantor needed
             </span>
           </div>
         </div>
