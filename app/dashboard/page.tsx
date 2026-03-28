@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from 'react';
 import { SystemTrustScore } from '@/components/trustrails/SystemTrustScore';
 import { AgentRepIDGrid }   from '@/components/trustrails/AgentRepIDGrid';
 import { LiveReceiptFeed }  from '@/components/trustrails/LiveReceiptFeed';
@@ -5,6 +8,24 @@ import { RiskSlider }       from '@/components/trustrails/RiskSlider';
 import { InstitutionalControls } from '@/components/trustrails/InstitutionalControls';
 
 export default function Dashboard() {
+  const [loading, setLoading] = useState<string | null>(null);
+  const [result, setResult] = useState<any>(null);
+
+  const handleDemo = async (type: 'villain' | 'compliance') => {
+    setLoading(type);
+    setResult(null);
+    try {
+      const url = type === 'villain' ? '/api/trustrails/demo/villain' : '/api/trustrails/demo';
+      const res = await fetch(url, { method: 'POST' });
+      const data = await res.json();
+      setResult({ type, success: res.ok, data });
+    } catch (err: any) {
+      setResult({ type, success: false, error: err.message });
+    } finally {
+      setLoading(null);
+    }
+  };
+
   return (
     <div style={{
       background: '#020817',
@@ -47,37 +68,71 @@ export default function Dashboard() {
             </div>
           </div>
           
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <a href="/api/trustrails/demo/villain" target="_blank" rel="noreferrer" style={{
-              background: '#991b1b',
-              color: '#f1f5f9',
-              border: 'none',
-              borderRadius: '6px',
-              padding: '10px 20px',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              ⛔ Run Guardrail Demo
-            </a>
-            <a href="/api/trustrails/demo" target="_blank" rel="noreferrer" style={{
-              background: '#1d4ed8',
-              color: '#f1f5f9',
-              border: 'none',
-              borderRadius: '6px',
-              padding: '10px 20px',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              ✅ Run Compliance Demo
-            </a>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => handleDemo('villain')} 
+                disabled={loading !== null} 
+                style={{
+                  background: '#991b1b',
+                  color: '#f1f5f9',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading === 'villain' ? 0.7 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                {loading === 'villain' ? '⏳ Running...' : '⛔ Run Guardrail Demo'}
+              </button>
+              <button 
+                onClick={() => handleDemo('compliance')} 
+                disabled={loading !== null} 
+                style={{
+                  background: '#1d4ed8',
+                  color: '#f1f5f9',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading === 'compliance' ? 0.7 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                {loading === 'compliance' ? '⏳ Running...' : '✅ Run Compliance Demo'}
+              </button>
+            </div>
+            
+            {result && (
+              <div style={{
+                background: result.success ? '#064e3b' : '#7f1d1d',
+                padding: '16px',
+                borderRadius: '8px',
+                maxWidth: '600px',
+                width: '100%',
+                fontSize: '13px',
+                fontFamily: 'monospace',
+                overflow: 'auto',
+                maxHeight: '300px',
+                border: result.success ? '1px solid #059669' : '1px solid #ef4444'
+              }}>
+                <h4 style={{ margin: '0 0 8px 0', color: '#f8fafc' }}>
+                  {result.type === 'villain' ? 'Guardrail Defense Results' : 'Compliance Execution Results'}
+                </h4>
+                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: '#cbd5e1' }}>
+                  {JSON.stringify(result.data || result.error, null, 2)}
+                </pre>
+              </div>
+            )}
           </div>
         </header>
 
