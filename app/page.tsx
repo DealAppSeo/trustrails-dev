@@ -82,7 +82,7 @@ export default function Home() {
           Solana Devnet, zero-knowledge proofs, and BFT consensus.
         </p>
 
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Link href="/dashboard" style={{
             background: '#1d4ed8',
             color: '#f1f5f9',
@@ -94,18 +94,6 @@ export default function Home() {
           }}>
             Launch Dashboard
           </Link>
-          <a href="/api/trustrails/demo" target="_blank" style={{
-            background: 'transparent',
-            border: '1px solid #1e293b',
-            color: '#f1f5f9',
-            padding: '16px 32px',
-            borderRadius: '8px',
-            fontWeight: 'bold',
-            fontSize: '16px',
-            textDecoration: 'none'
-          }}>
-            Run Golden Hash Demo
-          </a>
         </div>
       </main>
 
