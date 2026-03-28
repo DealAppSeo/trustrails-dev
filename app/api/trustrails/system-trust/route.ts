@@ -58,6 +58,18 @@ export async function GET() {
     status === 'MONITORING' ? '#f59e0b' :  // amber
     '#ef4444';                             // red
 
+  const { data: humanSbts } = await supabase
+    .from('human_sbt_registry')
+    .select('id, qualification_tier, active_custodianships, total_agents_graduated');
+
+  const totalHumanCustodians = humanSbts?.length || 0;
+  const totalActiveCustodianships = humanSbts?.reduce(
+    (sum, h) => sum + (h.active_custodianships || 0), 0
+  ) || 0;
+  const totalAgentsGraduated = humanSbts?.reduce(
+    (sum, h) => sum + (h.total_agents_graduated || 0), 0
+  ) || 0;
+
   return NextResponse.json({
     product:           'TrustRails',
     systemTrustScore:  systemScore,          // 0-10,000
@@ -71,6 +83,9 @@ export async function GET() {
     tierDistribution:  tiers,
     humanCustodyVerified: agents.filter(a => a.human_custody_verified).length,
     totalInsuranceCoverage: agents.reduce((s, a) => s + Number(a.insurance_coverage), 0),
+    totalHumanCustodians,
+    totalActiveCustodianships,
+    totalAgentsGraduated,
     last24Hours: {
       paymentsExecuted: totalTxns24h,
       volumeUSDC:       totalVolume24h,

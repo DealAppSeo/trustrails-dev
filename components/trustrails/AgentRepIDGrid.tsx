@@ -33,7 +33,24 @@ export function AgentRepIDGrid() {
     const load = async () => {
       const { data } = await supabase
         .from('agent_kya_registry')
-        .select('*')
+        .select(`
+          agent_name,
+          repid_score,
+          repid_tier,
+          human_custody_verified,
+          lifecycle_state,
+          custodian_link_active,
+          custodian_tier,
+          custodian_spending_authority,
+          autonomous_threshold,
+          transferable,
+          specialization,
+          spending_limit_per_tx,
+          insurance_coverage,
+          collateral_staked,
+          liability_tier,
+          vault_access_permitted
+        `)
         .order('repid_score', { ascending: false });
       setAgents(data || []);
     };
@@ -105,8 +122,56 @@ export function AgentRepIDGrid() {
               <div style={{ fontSize: 13, color: '#8b9ab0' }}>RepID / 10,000</div>
 
               {/* Progress bar */}
-              <div style={{ background: '#0f172a', borderRadius: 4, height: 6, marginTop: 10 }}>
-                <div style={{ width: `${pct}%`, height: 6, background: color, borderRadius: 4, transition: 'width 0.5s ease' }} />
+              <div style={{ position: 'relative', marginBottom: '8px', marginTop: '10px' }}>
+                <div style={{
+                  background: '#64748b',
+                  height: '6px',
+                  borderRadius: '3px',
+                  position: 'relative'
+                }}>
+                  <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: '3px', transition: 'width 0.5s ease' }} />
+                  {/* Autonomous threshold marker at 90% */}
+                  <div style={{
+                    position: 'absolute',
+                    left: '90%',
+                    top: '-3px',
+                    width: '3px',
+                    height: '12px',
+                    background: '#f59e0b',
+                    title: 'Autonomous threshold: 9,000'
+                  }} />
+                </div>
+                {/* Label only for agents near threshold */}
+                {agent.repid_score >= 8500 && (
+                  <div style={{
+                    fontSize: '13px',
+                    color: '#f59e0b',
+                    fontFamily: 'monospace',
+                    marginTop: '4px'
+                  }}>
+                    {agent.repid_score >= 9000 
+                      ? '📈 Autonomous threshold reached'
+                      : `${9000 - agent.repid_score} pts to autonomy`
+                    }
+                  </div>
+                )}
+              </div>
+
+              {/* Custodian & Spending Details */}
+              <div style={{ fontSize: '13px', color: '#94a3b8', marginTop: '12px', lineHeight: '1.6' }}>
+                <div>
+                  <strong>Limit:</strong> $
+                  {agent.lifecycle_state === 'UNCUSTODIED_DBT' 
+                    ? Number(agent.spending_limit_per_tx || 500).toLocaleString()
+                    : Number(agent.custodian_spending_authority || agent.spending_limit_per_tx || 25000).toLocaleString()
+                  }
+                </div>
+                <div>
+                  <strong>Custodian:</strong>{' '}
+                  {agent.lifecycle_state === 'EARNING_AUTONOMY' ? 'Qualified Investor · ZKP verified' :
+                   agent.lifecycle_state === 'CUSTODIED_DBT' ? 'Qualified Investor · ZKP verified · identity protected' :
+                   'None · agent-only liability · limited capability'}
+                </div>
               </div>
 
               {/* Badges */}

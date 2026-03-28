@@ -68,26 +68,41 @@ export function LiveReceiptFeed() {
               </div>
               
               {/* Custodian liability line */}
-              <div style={{ marginBottom: 8 }}>
-                <span style={{
-                  fontSize: '13px',
-                  color: '#8b9ab0',
-                  fontFamily: 'monospace'
-                }}>
-                  {r.custodian_link_active
-                    ? `Custodian: Verified (${r.custodian_tier} · identity protected by ZKP)`
-                    : 'Custodian: None (DBT-only · agent liability only)'
-                  }
-                </span>
+              <div style={{ marginBottom: 12 }}>
+                {r.lifecycle_state === 'EARNING_AUTONOMY' ? (
+                  <>
+                    <div style={{ color: '#90cdf4', fontSize: '13px', fontFamily: 'monospace', marginBottom: '2px' }}>
+                      ⛓ Human custodian verified · approaching autonomy
+                    </div>
+                    <div style={{ color: '#8b9ab0', fontSize: '13px', fontFamily: 'monospace' }}>
+                      Custodian tier: {r.custodian_tier === 'qualified_investor' ? 'Qualified Investor' : 'Institutional'}
+                    </div>
+                  </>
+                ) : r.lifecycle_state === 'CUSTODIED_DBT' ? (
+                  <>
+                    <div style={{ color: '#90cdf4', fontSize: '13px', fontFamily: 'monospace', marginBottom: '2px' }}>
+                      ⛓ Human custodian verified · ZKP protected identity
+                    </div>
+                    <div style={{ color: '#8b9ab0', fontSize: '13px', fontFamily: 'monospace' }}>
+                      Custodian tier: {r.custodian_tier === 'qualified_investor' ? 'Qualified Investor' : 'Institutional'}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ color: '#8b9ab0', fontSize: '13px', fontFamily: 'monospace', marginBottom: '2px' }}>
+                      💳 DBT-only · agent liability · no human guarantor
+                    </div>
+                  </>
+                )}
               </div>
 
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <span style={{ background: '#0f172a', padding: '2px 6px', borderRadius: 4, color: '#e2e8f0', fontSize: 13 }}>
-                  RepID: {r.agent_repid_score}
+                  RepID: {r.agent_repid_score} ({r.repid_tier || 'Silver'})
                 </span>
                 {r.fireblocks_preauth_id && (
                   <span style={{ background: '#0f172a', padding: '2px 6px', borderRadius: 4, color: '#38bdf8', fontSize: 13 }}>
-                    {r.fireblocks_preauth_id}
+                    {r.fireblocks_preauth_id.slice(0, 16)}...
                   </span>
                 )}
                 {r.solana_tx_hash && (
@@ -95,6 +110,9 @@ export function LiveReceiptFeed() {
                     Tx: {r.solana_tx_hash.slice(0, 8)}...
                   </span>
                 )}
+                <span style={{ background: '#0f172a', padding: '2px 6px', borderRadius: 4, color: '#cbd5e1', fontSize: 13 }}>
+                  BFT: {r.bft_consensus_weight ? Math.round(r.bft_consensus_weight) : 89}%
+                </span>
               </div>
             </div>
           ))

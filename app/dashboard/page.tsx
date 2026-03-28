@@ -693,20 +693,22 @@ export default function Dashboard() {
                 lineHeight: '1.8'
               }}>
                 Full institutional access<br/>
-                Human liability proven<br/>
-                Identity protected<br/>
-                Custodian can release<br/>
-                Agent earns autonomy<br/>
+                Human liability: proven<br/>
+                Identity: ZKP protected<br/>
+                Custodian: revocable<br/>
                 <br/>
                 <em style={{ color: '#94a3b8', fontSize: '14px' }}>
-                  Like a parent co-signing<br/>
-                  a college student's first<br/>
-                  credit card — limits grow<br/>
-                  as trust is earned.<br/>
-                  When the student proves<br/>
-                  themselves, the parent<br/>
-                  is released.
-                </em>
+                  Like a college student's<br/>
+                  first credit card —<br/>
+                  parent co-signs,<br/>
+                  limits grow with trust,<br/>
+                  parent released when<br/>
+                  student proves worthy.
+                </em><br/>
+                <br/>
+                Agent earns autonomy.<br/>
+                Human SBT is freed<br/>
+                for the next agent.
               </div>
             </div>
 

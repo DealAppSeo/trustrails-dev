@@ -96,6 +96,23 @@ export function SystemTrustScore() {
         {data.tagline}
       </p>
 
+      {/* Human Custodianship summary */}
+      <div style={{
+        marginTop: 16,
+        padding: 12,
+        background: '#1e293b',
+        borderRadius: 8,
+        display: 'inline-flex',
+        gap: 24,
+        fontSize: 14,
+        color: '#94a3b8',
+        border: '1px solid #334155'
+      }}>
+        <div><strong>Verified Human Custodians:</strong> <span style={{ color: '#e2e8f0' }}>{data.totalHumanCustodians || 0}</span></div>
+        <div><strong>Active Custodianships:</strong> <span style={{ color: '#e2e8f0' }}>{data.totalActiveCustodianships || 0}</span></div>
+        <div><strong>Agents Earned Autonomy:</strong> <span style={{ color: '#e2e8f0' }}>{data.totalAgentsGraduated || 0}</span></div>
+      </div>
+
       {/* Key metrics row */}
       <div style={{ display: 'flex', gap: 24, marginTop: 24, justifyContent: 'center', flexWrap: 'wrap' }}>
         {[

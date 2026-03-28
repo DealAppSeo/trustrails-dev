@@ -24,7 +24,7 @@ export async function GET() {
   // 2. Fetch real agent names/RepID from agent_kya_registry
   const { data: agents } = await supabase
     .from('agent_kya_registry')
-    .select('agent_name, id, repid_score, repid_tier, human_custody_verified')
+    .select('agent_name, id, repid_score, repid_tier, human_custody_verified, lifecycle_state, custodian_link_active, custodian_tier')
     .order('repid_score', { ascending: false });
 
   // 3. Stats for stats bar

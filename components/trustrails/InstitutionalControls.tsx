@@ -62,6 +62,9 @@ const CONTROL_GROUPS = [
       { key: 'sanctions_refresh_hours',   type: 'slider',  label: 'ZKP sanctions re-validation frequency (hours)', min: 1, max: 168 },
       { key: 'auto_sar_threshold_usdc',   type: 'currency',label: 'Auto-flag for SAR review above' },
       { key: 'notify_on_suspicious_pattern', type: 'toggle', label: 'Alert on anomalous agent behavior patterns' },
+      { key: 'min_custodian_tier_vault',  type: 'select',  label: 'Minimum human custodian tier for vault access', options: [{id:'institutional',label:'Institutional'},{id:'qualified_investor',label:'Qualified Investor'},{id:'retail',label:'Retail'}] },
+      { key: 'autonomous_threshold',      type: 'slider',  label: 'RepID threshold for agent autonomy (self-custody)', min: 5000, max: 10000, step: 500 },
+      { key: 'permit_uncustodied_agents', type: 'toggle',  label: 'Permit fully uncustodied agents (DBT micro-payments only)' },
     ],
   },
   {
@@ -279,6 +282,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
                 <input type="range"
                   min={(control as any).min || 0}
                   max={(control as any).max || 100}
+                  step={(control as any).step || 1}
                   value={config[control.key] || 0}
                   onChange={e => setConfig((c: any) => ({ ...c, [control.key]: Number(e.target.value) }))}
                   style={{ flex: 1, accentColor: '#3b82f6' }}

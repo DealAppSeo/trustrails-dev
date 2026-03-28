@@ -68,6 +68,17 @@ export class ComplianceReceiptGenerator {
       createdAt:          new Date().toISOString(),
     };
 
+    // Fetch custodian context for metadata
+    const agentData = await this.supabase
+      .from('agent_kya_registry')
+      .select('lifecycle_state, custodian_link_active, custodian_tier')
+      .eq('agent_name', params.kyaResult.agentName)
+      .single();
+
+    const custodian_context = agentData.data?.custodian_link_active 
+      ? `Custodian verified (${agentData.data?.custodian_tier}) — ZKP protected`
+      : 'DBT-only — agent liability only';
+
     // Persist to Supabase
     await this.supabase.from('kya_compliance_receipts').insert({
       receipt_id:           receipt.receiptId,
@@ -93,6 +104,7 @@ export class ComplianceReceiptGenerator {
       solana_explorer_url:  receipt.solanaExplorerUrl,
       fireblocks_preauth_id: receipt.fireblocksPreAuthId,
       audit_hash:           receipt.auditHash,
+      custodian_context:    custodian_context,
     });
 
     return receipt;
