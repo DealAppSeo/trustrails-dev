@@ -24,7 +24,7 @@ export default function RootLayout({
           textAlign: 'center',
           padding: '16px',
           fontSize: '12px',
-          color: '#64748b',
+          color: '#8b9ab0',
           borderTop: '1px solid #1e293b',
           fontFamily: 'monospace'
         }}>

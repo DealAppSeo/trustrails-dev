@@ -54,21 +54,21 @@ export function LiveReceiptFeed() {
               background: '#1e293b',
               borderLeft: `4px solid ${r.bft_passed ? '#22c55e' : '#ef4444'}`,
               borderRadius: 8,
-              padding: 16,
+              padding: '12px 16px',
               fontSize: 14,
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ color: '#f8fafc', fontWeight: 600 }}>{r.agent_name}</span>
                 <span style={{ color: r.bft_passed ? '#4ade80' : '#f87171' }}>
                   {r.bft_passed ? 'COMPLIANT' : 'BLOCKED'}
                 </span>
               </div>
-              <div style={{ color: '#94a3b8', marginBottom: 8 }}>
+              <div style={{ color: '#94a3b8', marginBottom: '8px' }}>
                 <strong>Amount:</strong> {r.payment_amount_usdc} USDC
               </div>
               
               {/* Custodian liability line */}
-              <div style={{ marginBottom: 12 }}>
+              <div style={{ marginBottom: '8px' }}>
                 {r.lifecycle_state === 'EARNING_AUTONOMY' ? (
                   <>
                     <div style={{ color: '#90cdf4', fontSize: '13px', fontFamily: 'monospace', marginBottom: '2px' }}>

@@ -98,19 +98,19 @@ export function AgentRepIDGrid() {
                     <span 
                       title="Approaching autonomous threshold (RepID 9000). Human custodian exposure decreasing. Soon self-custodying — earned through verified behavior."
                       style={{ background: '#78350f', color: '#fcd34d', fontSize: '13px', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace', marginLeft: '4px' }}
-                    >📈 EARNING</span>
+                    >📈 PROVEN</span>
                   )}
                   {agent.lifecycle_state === 'CUSTODIED_DBT' && (
                     <span 
                       title="Human custodian verified via Zero-Knowledge Proof. Identity proven, never revealed. Satisfies MiCA UBO requirement without exposing identity."
                       style={{ background: '#1e3a5f', color: '#60a5fa', fontSize: '13px', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace', marginLeft: '4px' }}
-                    >⛓ CUSTODIED</span>
+                    >⛓ SPONSORED</span>
                   )}
                   {agent.lifecycle_state === 'UNCUSTODIED_DBT' && (
                     <span 
                       title="No human custodian. Agent-only liability. Limited to micro-payments. No vault access. Link a verified human custodian to unlock full capability."
                       style={{ background: '#1e293b', color: '#8b9ab0', fontSize: '13px', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace', marginLeft: '4px' }}
-                    >💳 DBT</span>
+                    >🆕 REGISTERED</span>
                   )}
                 </div>
               </div>
@@ -124,7 +124,7 @@ export function AgentRepIDGrid() {
               {/* Progress bar */}
               <div style={{ position: 'relative', marginBottom: '8px', marginTop: '10px' }}>
                 <div style={{
-                  background: '#64748b',
+                  background: '#8b9ab0',
                   height: '6px',
                   borderRadius: '3px',
                   position: 'relative'

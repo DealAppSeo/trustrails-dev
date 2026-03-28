@@ -59,6 +59,12 @@ const CONTROL_GROUPS = [
     persona: 'Chief Compliance Officer',
     controls: [
       { key: 'regulatory_profile',        type: 'select',  label: 'Regulatory profile', options: REGULATORY_PROFILES },
+      { key: 'min_agent_trust_requirement', type: 'radio',   label: 'Minimum Agent Trust Requirement', options: [
+          { id: 'registered', label: 'Registered (any network agent)' },
+          { id: 'sponsored',  label: 'Sponsored (must have human custodian)' },
+          { id: 'proven',     label: 'Proven (RepID >= 7500)' },
+          { id: 'internal',   label: 'Internal Only (pre-approved list)' }
+      ]},
       { key: 'sanctions_refresh_hours',   type: 'slider',  label: 'ZKP sanctions re-validation frequency (hours)', min: 1, max: 168 },
       { key: 'auto_sar_threshold_usdc',   type: 'currency',label: 'Auto-flag for SAR review above' },
       { key: 'notify_on_suspicious_pattern', type: 'toggle', label: 'Alert on anomalous agent behavior patterns' },
@@ -198,7 +204,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
               style={{
                 background: config.regulatory_profile === profile.id ? '#1d4ed8' : '#1e293b',
                 color:      config.regulatory_profile === profile.id ? '#fff' : '#94a3b8',
-                border:     `1px solid ${config.regulatory_profile === profile.id ? '#3b82f6' : '#64748b'}`,
+                border:     `1px solid ${config.regulatory_profile === profile.id ? '#3b82f6' : '#8b9ab0'}`,
                 borderRadius: 6, padding: '4px 12px', fontSize: 13, cursor: 'pointer',
               }}>
               {profile.label}
@@ -215,7 +221,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
             style={{
               background:  activeGroup === group.id ? '#1e3a5f' : '#1e293b',
               color:       activeGroup === group.id ? '#93c5fd' : '#8b9ab0',
-              border:      `1px solid ${activeGroup === group.id ? '#3b82f6' : '#64748b'}`,
+              border:      `1px solid ${activeGroup === group.id ? '#3b82f6' : '#8b9ab0'}`,
               borderRadius: 8, padding: '6px 14px', fontSize: 13, cursor: 'pointer',
             }}>
             {group.label}
@@ -245,7 +251,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
                   onClick={() => setConfig((c: any) => ({ ...c, [control.key]: !c[control.key] }))}
                   style={{
                     width: 48, height: 26, borderRadius: 13,
-                    background: config[control.key] ? '#22c55e' : '#64748b',
+                    background: config[control.key] ? '#22c55e' : '#8b9ab0',
                     cursor: 'pointer', position: 'relative', flexShrink: 0,
                   }}>
                   <div style={{
@@ -268,7 +274,7 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
                   value={config[control.key] || 0}
                   onChange={e => setConfig((c: any) => ({ ...c, [control.key]: Number(e.target.value) }))}
                   style={{
-                    background: '#0f172a', border: '1px solid #64748b',
+                    background: '#0f172a', border: '1px solid #8b9ab0',
                     borderRadius: 6, padding: '6px 12px', color: '#f1f5f9',
                     fontSize: 16, fontWeight: 700, width: 160,
                   }}
@@ -298,13 +304,30 @@ export function InstitutionalControls({ institutionId = 'default' }: { instituti
                 value={config[control.key] || ''}
                 onChange={e => setConfig((c: any) => ({ ...c, [control.key]: e.target.value }))}
                 style={{
-                  background: '#0f172a', border: '1px solid #64748b',
+                  background: '#0f172a', border: '1px solid #8b9ab0',
                   borderRadius: 6, padding: '6px 12px', color: '#f1f5f9', fontSize: 14,
                 }}>
                 {((control as any).options || []).map((opt: any) => (
                   <option key={opt.id} value={opt.id}>{opt.label}</option>
                 ))}
               </select>
+            )}
+
+            {control.type === 'radio' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {((control as any).options || []).map((opt: any) => (
+                  <label key={opt.id} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: '#f1f5f9' }}>
+                    <input type="radio"
+                      name={control.key}
+                      value={opt.id}
+                      checked={(config[control.key] || 'sponsored') === opt.id}
+                      onChange={e => setConfig((c: any) => ({ ...c, [control.key]: e.target.value }))}
+                      style={{ accentColor: '#3b82f6' }}
+                    />
+                    {opt.label}
+                  </label>
+                ))}
+              </div>
             )}
           </div>
         ))}

@@ -88,7 +88,7 @@ export default function Dashboard() {
   const Bar = ({ label, score, target }: { label: string, score: number, target: string }) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', fontSize: '15px', fontFamily: 'monospace' }}>
       <div style={{ width: '60px' }}>{label}</div>
-      <div style={{ width: '120px', background: '#64748b', height: '12px', position: 'relative' }}>
+      <div style={{ width: '120px', background: '#8b9ab0', height: '12px', position: 'relative' }}>
         <div className="bft-bar" style={{ background: '#3b82f6', height: '100%', '--target-width': target } as any} />
       </div>
       <div>{score} ✓</div>
@@ -115,7 +115,7 @@ export default function Dashboard() {
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes spin { to { transform: rotate(360deg); } }
         .spinner {
-          width: 16px; height: 16px; border: 2px solid #64748b;
+          width: 16px; height: 16px; border: 2px solid #8b9ab0;
           border-top-color: #1d4ed8; border-radius: 50%;
           animation: spin 0.8s linear infinite; display: inline-block;
         }
@@ -146,6 +146,8 @@ export default function Dashboard() {
         <span>Last BFT: {new Date(stats.lastBft).toLocaleTimeString()}</span>
         <span>·</span>
         <span>Hallucination catch rate: {stats.hallucinationCatchRate}</span>
+        <span>·</span>
+        <span>Solana TPS available: 65,000</span>
       </div>
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 16px' }}>
@@ -173,7 +175,7 @@ export default function Dashboard() {
                 style={{
                   background: profile === p.id ? '#1d4ed8' : 'transparent',
                   color: profile === p.id ? '#fff' : '#94a3b8',
-                  border: `1px solid ${profile === p.id ? '#1d4ed8' : '#64748b'}`,
+                  border: `1px solid ${profile === p.id ? '#1d4ed8' : '#8b9ab0'}`,
                   padding: '8px 16px', borderRadius: '24px', cursor: 'pointer',
                   fontSize: '15px', fontWeight: 'bold', transition: 'all 0.2s'
                 }}
@@ -355,7 +357,7 @@ export default function Dashboard() {
                 </div>
 
                 {revealLC && (
-                  <div style={{ border: '1px solid #64748b', borderRadius: '8px', padding: '16px', fontFamily: 'monospace', fontSize: '14px', background: '#0f172a' }}>
+                  <div style={{ border: '1px solid #8b9ab0', borderRadius: '8px', padding: '16px', fontFamily: 'monospace', fontSize: '14px', background: '#0f172a' }}>
                     <div style={{ color: '#94a3b8', marginBottom: '8px' }}>Guardrail Summary · {profileConfig.name}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', color: '#f8fafc' }}>
                       <span>🚫 Blocked: {profile === 'conservative' ? 2 : 1}</span>
@@ -411,6 +413,8 @@ export default function Dashboard() {
                         Custodian liability: Qualified Investor (ZKP-verified)<br/>
                         Human identity: Proven, not revealed.<br/>
                         Solana Tx: <a href={`https://explorer.solana.com/tx/${getHash(1)}?cluster=devnet`} target="_blank" rel="noopener" style={{color: '#60a5fa'}} title={getHash(1)}>{truncate(getHash(1))}</a><br/>
+                        Memo field: compliance_hash + RepID + BFT weight<br/>
+                        Regulators can verify independently — without us.<br/>
                         ZKP Proof: zk_proof_bafybeig...<br/>
                         Audit Hash: SHA256:8f2...<br/>
                       </div>
@@ -502,7 +506,7 @@ export default function Dashboard() {
                 </div>
 
                 {revealRC && (
-                  <div style={{ border: '1px solid #64748b', borderRadius: '8px', padding: '16px', fontFamily: 'monospace', fontSize: '14px', background: '#0f172a' }}>
+                  <div style={{ border: '1px solid #8b9ab0', borderRadius: '8px', padding: '16px', fontFamily: 'monospace', fontSize: '14px', background: '#0f172a' }}>
                     <div style={{ color: '#94a3b8', marginBottom: '8px' }}>Compliance Summary · {profileConfig.name}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', color: '#f8fafc' }}>
                       <span>✅ Approved: {profile === 'aggressive' ? 3 : 2}</span>
@@ -529,6 +533,10 @@ export default function Dashboard() {
               YOUR institution decides.<br/>
               TrustRails enforces it — cryptographically, every time,<br/>
               at every threshold, with full audit trail.<br/><br/>
+              Identity anchored on Base Sepolia ·<br/>
+              Payments settling on Solana ·<br/>
+              Agent commerce via x402 ·<br/>
+              One compliance layer · any chain · any agent.<br/><br/>
               This is how you stay ahead of competitors who are waiting.<br/>
               Safe agents. Verifiable compliance. Institutional control.<br/><br/>
               <span style={{ color: '#60a5fa' }}>
@@ -569,7 +577,7 @@ export default function Dashboard() {
             {/* Column 1 — DBT Agent */}
             <div style={{
               background: '#0a0f1e',
-              border: '1px solid #64748b',
+              border: '1px solid #8b9ab0',
               borderRadius: '8px',
               padding: '20px',
               textAlign: 'center'

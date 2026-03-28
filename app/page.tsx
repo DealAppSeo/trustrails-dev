@@ -123,6 +123,34 @@ export default function Home() {
         ))}
       </section>
 
+      {/* Tech Stack Row */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        gap: '12px',
+        flexWrap: 'wrap',
+        marginBottom: '20px'
+      }}>
+        {[
+          '⚡ Solana — Settlement · 400ms · $0.00025/tx',
+          '🔷 Base Sepolia — Identity · ERC-8004',
+          '💱 x402 — Agent-to-Agent Payments',
+          '🔗 HyperDAG — Reputation DAG'
+        ].map((badge, i) => (
+          <div key={i} style={{
+            background: '#1e293b',
+            color: '#64748b',
+            fontSize: '12px',
+            fontFamily: 'monospace',
+            padding: '8px',
+            border: '1px solid #334155',
+            borderRadius: '4px'
+          }}>
+            {badge}
+          </div>
+        ))}
+      </div>
+
       <div style={{
         textAlign: 'center',
         fontSize: '13px',

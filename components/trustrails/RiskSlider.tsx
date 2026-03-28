@@ -51,7 +51,7 @@ export function RiskSlider({ onRepIDChange }: { onRepIDChange?: (score: number) 
         {Object.entries(PRESETS).map(([label, preset]) => (
           <button key={label}
             onClick={() => setWeights(preset)}
-            style={{ background: '#0f172a', color: '#94a3b8', border: '1px solid #64748b', borderRadius: 6, padding: '4px 12px', fontSize: 13, cursor: 'pointer' }}>
+            style={{ background: '#0f172a', color: '#94a3b8', border: '1px solid #8b9ab0', borderRadius: 6, padding: '4px 12px', fontSize: 13, cursor: 'pointer' }}>
             {label}
           </button>
         ))}
