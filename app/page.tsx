@@ -55,7 +55,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <main style={{
-        padding: '100px 32px',
+        padding: '64px 32px 24px 32px',
         maxWidth: '900px',
         margin: '0 auto',
         textAlign: 'center'
@@ -67,7 +67,7 @@ export default function Home() {
           borderRadius: '24px',
           fontSize: '13px',
           fontWeight: 'bold',
-          marginBottom: '32px'
+          marginBottom: '24px'
         }}>
           StableHacks 2026 Submission
         </div>
@@ -76,7 +76,7 @@ export default function Home() {
           The SSL Layer for the <br />Agentic Economy.
         </h1>
         
-        <p style={{ fontSize: '20px', color: '#94a3b8', lineHeight: '1.6', marginBottom: '48px', maxWidth: '700px', margin: '0 auto 48px auto' }}>
+        <p style={{ fontSize: '20px', color: '#94a3b8', lineHeight: '1.6', marginBottom: '24px', maxWidth: '700px', margin: '0 auto' }}>
           Banks have KYC for humans. TrustRails has KYA for agents. 
           A mathematically enforced oracle bridging AI autonomy to institutional compliance via 
           Solana Devnet, zero-knowledge proofs, and BFT consensus.
@@ -92,7 +92,7 @@ export default function Home() {
         gap: '24px',
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '48px 32px 100px 32px'
+        padding: '24px 32px 64px 32px'
       }}>
         {[
           { icon: '🔐', title: 'Absolute Liability', desc: 'DBT logic mapped strictly to SBTs to bind AI actions to real-world corporate liable entities.' },
