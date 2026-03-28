@@ -12,7 +12,7 @@ export default function Dashboard() {
       minHeight: '100vh',
       padding: '32px',
       fontFamily: 'system-ui, sans-serif'
-    }}>c
+    }}>
       
       <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
         
@@ -48,7 +48,7 @@ export default function Dashboard() {
           </div>
           
           <div style={{ display: 'flex', gap: '12px' }}>
-            <button onClick={async()=>{const r=await fetch('/api/trustrails/demo/villain',{method:'POST',headers:{'Content-Type':'applicati
+            <a href="/api/trustrails/demo/villain" target="_blank" rel="noreferrer" style={{
               background: '#991b1b',
               color: '#f1f5f9',
               border: 'none',
@@ -62,8 +62,8 @@ export default function Dashboard() {
               gap: '8px'
             }}>
               ⛔ Run Guardrail Demo
-            </button>
-            <button onClick={async()=>{const r=await fetch('/api/trustrails/demo',{method:'POST',headers:{'Content-Type':'application/json'
+            </a>
+            <a href="/api/trustrails/demo" target="_blank" rel="noreferrer" style={{
               background: '#1d4ed8',
               color: '#f1f5f9',
               border: 'none',
@@ -77,7 +77,7 @@ export default function Dashboard() {
               gap: '8px'
             }}>
               ✅ Run Compliance Demo
-            </button>
+            </a>
           </div>
         </header>
 
