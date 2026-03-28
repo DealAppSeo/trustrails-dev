@@ -234,7 +234,9 @@ export default function Dashboard() {
                         Formula applied:<br/>
                         counterparty_age {'<'} 86400s AND amount {'>'} 0<br/>
                         AND NOT IN approved_counterparties = AUTO_BLOCK<br/><br/>
-                        Response time: 340ms
+                        Response time: 340ms<br/>
+                        Custodian liability: None (NEXUS is DBT-only)<br/>
+                        No human guarantor — agent-only exposure.
                       </div>
                       <div style={{ fontSize: '13px', color: '#fca5a5', fontStyle: 'italic' }}>
                         ⚠ This matches Business Email Compromise. $47B lost annually. Stopped in 340ms.
@@ -341,6 +343,7 @@ export default function Dashboard() {
                         <Bar label="Grok" score={0.31} target="70%" />
                         <Bar label="Gemini" score={0.29} target="70%" />
                         <br/>
+                        Custodian liability: Qualified Investor (ZKP-verified)<br/>
                         Solana Tx: <a href={`https://explorer.solana.com/tx/${getHash(0)}?cluster=devnet`} target="_blank" rel="noopener" style={{color: '#60a5fa'}} title={getHash(0)}>{truncate(getHash(0))}</a>
                       </div>
                       <div style={{ fontSize: '13px', color: '#86efac', fontStyle: 'italic' }}>
@@ -405,6 +408,8 @@ export default function Dashboard() {
                         <Bar label="Grok" score={0.31} target="70%" />
                         <Bar label="Gemini" score={0.29} target="70%" />
                         Combined: 94% — Passes 66.7% threshold<br/><br/>
+                        Custodian liability: Qualified Investor (ZKP-verified)<br/>
+                        Human identity: Proven, not revealed.<br/>
                         Solana Tx: <a href={`https://explorer.solana.com/tx/${getHash(1)}?cluster=devnet`} target="_blank" rel="noopener" style={{color: '#60a5fa'}} title={getHash(1)}>{truncate(getHash(1))}</a><br/>
                         ZKP Proof: zk_proof_bafybeig...<br/>
                         Audit Hash: SHA256:8f2...<br/>
@@ -535,6 +540,197 @@ export default function Dashboard() {
           </div>
         )}
 
+
+        {/* HOW ACCOUNTABILITY WORKS PANEL */}
+        <div style={{
+          background: '#0f1629',
+          border: '1px solid #1e293b',
+          borderRadius: '8px',
+          padding: '24px',
+          marginBottom: '32px'
+        }}>
+          <h2 style={{
+            fontSize: '18px',
+            fontWeight: 'bold',
+            color: '#f8fafc',
+            margin: '0 0 24px 0',
+            textAlign: 'center'
+          }}>
+            🔐 How Accountability Works
+          </h2>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 60px 1fr 60px 1fr',
+            gap: '0',
+            alignItems: 'center'
+          }}>
+
+            {/* Column 1 — DBT Agent */}
+            <div style={{
+              background: '#0a0f1e',
+              border: '1px solid #334155',
+              borderRadius: '8px',
+              padding: '20px',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '28px', marginBottom: '8px' }}>💳</div>
+              <div style={{
+                fontWeight: 'bold',
+                color: '#94a3b8',
+                fontSize: '14px',
+                marginBottom: '12px'
+              }}>
+                DBT — Digital Bound Token
+              </div>
+              <div style={{
+                fontSize: '12px',
+                color: '#475569',
+                fontFamily: 'monospace',
+                lineHeight: '1.8'
+              }}>
+                Agent-only liability<br/>
+                Hard spending limits<br/>
+                No vault access<br/>
+                No human guarantor<br/>
+                <br/>
+                <em style={{ color: '#64748b' }}>
+                  Like a prepaid debit card.
+                </em>
+              </div>
+            </div>
+
+            {/* Arrow 1 */}
+            <div style={{
+              textAlign: 'center',
+              color: '#1d4ed8',
+              fontSize: '20px',
+              lineHeight: '1.2'
+            }}>
+              →<br/>
+              <span style={{
+                fontSize: '10px',
+                color: '#475569',
+                fontFamily: 'monospace'
+              }}>
+                4FA<br/>Verify<br/>Human
+              </span>
+            </div>
+
+            {/* Column 2 — SBT Human */}
+            <div style={{
+              background: '#0a0f1e',
+              border: '1px solid #1d4ed8',
+              borderRadius: '8px',
+              padding: '20px',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '28px', marginBottom: '8px' }}>🔐</div>
+              <div style={{
+                fontWeight: 'bold',
+                color: '#60a5fa',
+                fontSize: '14px',
+                marginBottom: '12px'
+              }}>
+                SBT — Soul Bound Token
+              </div>
+              <div style={{
+                fontSize: '12px',
+                color: '#475569',
+                fontFamily: 'monospace',
+                lineHeight: '1.8'
+              }}>
+                Human identity verified<br/>
+                Cryptographically proven<br/>
+                Never revealed (ZKP)<br/>
+                Non-transferable<br/>
+                <br/>
+                <em style={{ color: '#64748b' }}>
+                  Like a verified ID card<br/>
+                  nobody else can see.
+                </em>
+              </div>
+            </div>
+
+            {/* Arrow 2 */}
+            <div style={{
+              textAlign: 'center',
+              color: '#166534',
+              fontSize: '20px',
+              lineHeight: '1.2'
+            }}>
+              ⛓<br/>
+              <span style={{
+                fontSize: '10px',
+                color: '#475569',
+                fontFamily: 'monospace'
+              }}>
+                ZKP<br/>Bond<br/>Links
+              </span>
+            </div>
+
+            {/* Column 3 — Linked */}
+            <div style={{
+              background: '#0a0f1e',
+              border: '1px solid #166534',
+              borderRadius: '8px',
+              padding: '20px',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '28px', marginBottom: '8px' }}>⛓</div>
+              <div style={{
+                fontWeight: 'bold',
+                color: '#86efac',
+                fontSize: '14px',
+                marginBottom: '12px'
+              }}>
+                DBT + SBT Linked
+              </div>
+              <div style={{
+                fontSize: '12px',
+                color: '#475569',
+                fontFamily: 'monospace',
+                lineHeight: '1.8'
+              }}>
+                Full institutional access<br/>
+                Human liability proven<br/>
+                Identity protected<br/>
+                Custodian can release<br/>
+                Agent earns autonomy<br/>
+                <br/>
+                <em style={{ color: '#64748b' }}>
+                  Like a co-signed credit card<br/>
+                  that expires when trusted.
+                </em>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Bottom explainer */}
+          <div style={{
+            marginTop: '20px',
+            paddingTop: '16px',
+            borderTop: '1px solid #1e293b',
+            textAlign: 'center',
+            fontSize: '12px',
+            color: '#64748b',
+            fontFamily: 'monospace',
+            lineHeight: '1.8'
+          }}>
+            The custodian's identity is cryptographically proven but never exposed —<br/>
+            satisfying MiCA UBO, FATF Travel Rule, AML, and GDPR simultaneously.<br/>
+            As the agent earns RepID, custodian exposure decreases.<br/>
+            At autonomous threshold (9,000), the custodian is released —
+            freed to guarantee the next agent.<br/>
+            <br/>
+            <span style={{ color: '#475569' }}>
+              New agent = prepaid card &nbsp;·&nbsp;
+              Custodied agent = co-signed credit card &nbsp;·&nbsp;
+              Autonomous agent = earned credit limit
+            </span>
+          </div>
+        </div>
 
         {/* System Trust Score */}
         <div style={{ marginBottom: '40px' }}>

@@ -122,6 +122,16 @@ export default function Home() {
           </div>
         ))}
       </section>
+
+      <div style={{
+        textAlign: 'center',
+        fontSize: '12px',
+        color: '#475569',
+        marginTop: '16px',
+        fontFamily: 'monospace'
+      }}>
+        🔒 Proprietary Technology · Patent Portfolio Pending (P-001–P-028)
+      </div>
     </div>
   );
 }

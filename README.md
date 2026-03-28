@@ -2,6 +2,13 @@
 
 **StableHacks 2026 Submission** | Tracks 1 (Permissioned Vaults) & 3 (Programmable Payments)
 
+> **⚠️ Proprietary Technology Notice**  
+> Core algorithms including SBFA (Stochastic Bias Fracture Array),  
+> Pythagorean Comma Veto, RepID scoring engine, and  
+> DBT/SBT custodianship architecture are covered by a  
+> pending patent portfolio (P-001–P-028).  
+> © 2026 HyperDAG Protocol. All rights reserved.
+
 The global agentic economy is arriving faster than institutional compliance can adapt. AI agents are already managing treasuries and executing payments — but nobody has solved who is accountable when an agent makes a financial mistake.
 
 Banks have KYC for people. The agentic economy needs KYA — **Know Your Agent**.

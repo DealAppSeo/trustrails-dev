@@ -67,6 +67,20 @@ export function LiveReceiptFeed() {
                 <strong>Amount:</strong> {r.payment_amount_usdc} USDC
               </div>
               
+              {/* Custodian liability line */}
+              <div style={{ marginBottom: 8 }}>
+                <span style={{
+                  fontSize: '11px',
+                  color: '#64748b',
+                  fontFamily: 'monospace'
+                }}>
+                  {r.custodian_link_active
+                    ? `Custodian: Verified (${r.custodian_tier} · identity protected by ZKP)`
+                    : 'Custodian: None (DBT-only · agent liability only)'
+                  }
+                </span>
+              </div>
+
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <span style={{ background: '#0f172a', padding: '2px 6px', borderRadius: 4, color: '#e2e8f0', fontSize: 11 }}>
                   RepID: {r.agent_repid_score}

@@ -69,13 +69,33 @@ export function AgentRepIDGrid() {
                 <span style={{ fontWeight: 700, fontSize: 15, color: '#f1f5f9' }}>
                   {agent.agent_name}
                 </span>
-                <span style={{
-                  fontSize: 10, fontWeight: 700, color,
-                  border: `1px solid ${color}`,
-                  borderRadius: 4, padding: '2px 6px',
-                }}>
-                  {agent.repid_tier?.toUpperCase()}
-                </span>
+                <div>
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, color,
+                    border: `1px solid ${color}`,
+                    borderRadius: 4, padding: '2px 6px',
+                  }}>
+                    {agent.repid_tier?.toUpperCase()}
+                  </span>
+                  {agent.lifecycle_state === 'EARNING_AUTONOMY' && (
+                    <span 
+                      title="Approaching autonomous threshold (RepID 9000). Human custodian exposure decreasing. Soon self-custodying — earned through verified behavior."
+                      style={{ background: '#78350f', color: '#fcd34d', fontSize: '10px', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace', marginLeft: '4px' }}
+                    >📈 EARNING</span>
+                  )}
+                  {agent.lifecycle_state === 'CUSTODIED_DBT' && (
+                    <span 
+                      title="Human custodian verified via Zero-Knowledge Proof. Identity proven, never revealed. Satisfies MiCA UBO requirement without exposing identity."
+                      style={{ background: '#1e3a5f', color: '#60a5fa', fontSize: '10px', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace', marginLeft: '4px' }}
+                    >⛓ CUSTODIED</span>
+                  )}
+                  {agent.lifecycle_state === 'UNCUSTODIED_DBT' && (
+                    <span 
+                      title="No human custodian. Agent-only liability. Limited to micro-payments. No vault access. Link a verified human custodian to unlock full capability."
+                      style={{ background: '#1e293b', color: '#64748b', fontSize: '10px', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace', marginLeft: '4px' }}
+                    >💳 DBT</span>
+                  )}
+                </div>
               </div>
 
               {/* RepID score */}

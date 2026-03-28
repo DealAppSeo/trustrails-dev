@@ -20,6 +20,18 @@ export default function RootLayout({
         fontFamily: 'system-ui, sans-serif' 
       }}>
         {children}
+        <footer style={{
+          textAlign: 'center',
+          padding: '16px',
+          fontSize: '11px',
+          color: '#334155',
+          borderTop: '1px solid #1e293b',
+          fontFamily: 'monospace'
+        }}>
+          © 2026 HyperDAG Protocol · TrustRails ·
+          Patent Portfolio Pending (P-001–P-028) ·
+          Proprietary Technology — All Rights Reserved
+        </footer>
       </body>
     </html>
   );
