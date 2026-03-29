@@ -569,7 +569,7 @@ export default function Dashboard() {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 48px 1fr 48px 1fr',
+            gridTemplateColumns: '1fr 80px 1fr 80px 1fr',
             gap: '0',
             alignItems: 'stretch'
           }}>
@@ -613,21 +613,39 @@ export default function Dashboard() {
             {/* Arrow 1 */}
             <div style={{
               textAlign: 'center',
-              color: '#1d4ed8',
-              fontSize: '20px',
-              lineHeight: '1.2',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'relative',
+              padding: '12px',
+              background: 'rgba(30, 58, 95, 0.3)',
+              borderRadius: '8px'
             }}>
-              →<br/>
-              <span style={{
-                fontSize: '13px',
-                color: '#8b9ab0',
-                fontFamily: 'monospace'
-              }}>
-                4FA<br/>Verify<br/>Human
-              </span>
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '1px',
+                borderLeft: '1px dashed rgba(96, 165, 250, 0.3)',
+                zIndex: 0
+              }} />
+              <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.5">
+                  <path d="M12 2C9.243 2 7 4.243 7 7v5"/>
+                  <path d="M12 2c2.757 0 5 2.243 5 5v5"/>
+                  <path d="M7 12c0 2.757 2.243 5 5 5"/>
+                  <path d="M17 12c0 2.757-2.243 5-5 5"/>
+                  <path d="M9 12c0 1.657 1.343 3 3 3"/>
+                  <path d="M15 12c0-1.657-1.343 3-3-3"/>
+                  <path d="M12 9v3"/>
+                </svg>
+                <div style={{ fontSize: '20px', color: '#93c5fd', fontWeight: 'bold', fontFamily: 'monospace' }}>4FA</div>
+                <div style={{ fontSize: '13px', color: '#60a5fa', fontFamily: 'monospace' }}>Verify<br/>Human</div>
+                <div style={{ color: '#60a5fa', fontSize: '28px', lineHeight: '1' }}>→</div>
+              </div>
             </div>
 
             {/* Column 2 — SBT Human */}
@@ -670,21 +688,34 @@ export default function Dashboard() {
             {/* Arrow 2 */}
             <div style={{
               textAlign: 'center',
-              color: '#166534',
-              fontSize: '20px',
-              lineHeight: '1.2',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'relative',
+              padding: '12px',
+              background: 'rgba(20, 83, 45, 0.3)',
+              borderRadius: '8px'
             }}>
-              ⛓<br/>
-              <span style={{
-                fontSize: '13px',
-                color: '#8b9ab0',
-                fontFamily: 'monospace'
-              }}>
-                ZKP<br/>Bond<br/>Links
-              </span>
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '1px',
+                borderLeft: '1px dashed rgba(74, 222, 128, 0.3)',
+                zIndex: 0
+              }} />
+              <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="1.5">
+                  <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+                </svg>
+                <div style={{ fontSize: '20px', color: '#4ade80', fontWeight: 'bold', fontFamily: 'monospace' }}>ZKP</div>
+                <div style={{ fontSize: '13px', color: '#34d399', fontFamily: 'monospace' }}>Bond<br/>Links</div>
+                <div style={{ color: '#4ade80', fontSize: '28px', lineHeight: '1' }}>⛓</div>
+              </div>
             </div>
 
             {/* Column 3 — Linked */}
