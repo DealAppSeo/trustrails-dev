@@ -96,7 +96,7 @@ export default function Home() {
       }}>
         {[
           { icon: '⚖️', title: 'BFT Consensus', desc: 'No single LLM controls the network. Institutional transactions require distributed multi-model approval.' },
-          { icon: '🔐', title: 'Absolute Liability', desc: 'DBT logic mapped strictly to SBTs to bind AI actions to real-world corporate liable entities.' },
+          { icon: '🔐', title: 'Verified Accountability', desc: 'Agent actions cryptographically bound to a verified responsible party — proven without being revealed. You set the requirement. We enforce it.' },
           { icon: '⚡', title: 'Solana L1 Settlement', desc: 'Every authorized transaction natively executes on-chain with compact encoded compliance memos.' }
         ].map((feat, i) => (
           <div key={i} style={{
