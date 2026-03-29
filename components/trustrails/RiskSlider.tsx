@@ -17,19 +17,44 @@ export function RiskSlider({ onRepIDChange }: { onRepIDChange?: (score: number) 
   const [weights, setWeights] = useState(PRESETS['Default TrustRails']);
   const [sophiaRepID, setSophiaRepID] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const apply = async () => {
     setLoading(true);
-    const res = await fetch('/api/trustrails/repid/configure', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ institutionId: 'demo-judge', weights }),
-    });
-    const data = await res.json();
-    const newScore = data.sophiaRepIDWithNewWeights?.repidScore;
-    setSophiaRepID(newScore);
-    onRepIDChange?.(newScore);
-    setLoading(false);
+    setErrorMsg('');
+    const prevRepID = sophiaRepID;
+    
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const res = await fetch('/api/trustrails/repid/configure', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ institutionId: 'demo-judge', weights }),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      
+      if (!res.ok) throw new Error('Failed to recalculate RepID');
+      
+      const data = await res.json();
+      const newScore = data.sophiaRepIDWithNewWeights?.repidScore;
+      
+      if (newScore !== undefined) {
+        setSophiaRepID(newScore);
+        onRepIDChange?.(newScore);
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (err: any) {
+      console.error("Recalculation error or timeout:", err);
+      // restore previous RepID
+      setSophiaRepID(prevRepID);
+      setErrorMsg('Recalculation timed out. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const scoreColor = !sophiaRepID ? '#8b9ab0' :
@@ -85,9 +110,26 @@ export function RiskSlider({ onRepIDChange }: { onRepIDChange?: (score: number) 
 
       {/* Apply button */}
       <button onClick={apply} disabled={loading}
-        style={{ width: '100%', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 0', fontSize: 15, fontWeight: 600, cursor: 'pointer', marginTop: 8 }}>
-        {loading ? 'Recalculating...' : 'Apply to My Institution →'}
+        style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 0', fontSize: 15, fontWeight: 600, cursor: 'pointer', marginTop: 8 }}>
+        {loading ? (
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke="#fff">
+            <g fill="none" fillRule="evenodd">
+              <g transform="translate(1 1)" strokeWidth="2">
+                <circle strokeOpacity=".5" cx="11" cy="11" r="11"/>
+                <path d="M22 11c0-6.075-4.925-11-11-11">
+                  <animateTransform attributeName="transform" type="rotate" from="0 11 11" to="360 11 11" dur="1s" repeatCount="indefinite"/>
+                </path>
+              </g>
+            </g>
+          </svg>
+        ) : 'Apply to My Institution →'}
       </button>
+
+      {errorMsg && (
+        <p style={{ color: '#ef4444', fontSize: 13, marginTop: 8, textAlign: 'center' }}>
+          ⚠️ {errorMsg}
+        </p>
+      )}
 
       {/* Live result */}
       {sophiaRepID && (
