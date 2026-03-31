@@ -36,21 +36,7 @@ async function main() {
     console.warn(`⚠️ Warning: Airdrop failed (rate limited?). Proceeding anyway: ${e.message}`);
   }
 
-  // 3. Create Mock USDC Mint (since real Devnet USDC faucet might be flaky)
-  console.log('🔄 Creating Mock USDC Mint...');
-  let mint: PublicKey | null = null;
-  try {
-    mint = await createMint(connection, sophia, sophia.publicKey, null, 6);
-    console.log(`✓ Mock USDC Mint created: ${mint.toBase58()}`);
-
-    // 4. Mint 1M USDC to SOPHIA
-    console.log('🔄 Minting 1,000,000 Mock USDC to SOPHIA...');
-    const sophiaATA = await getOrCreateAssociatedTokenAccount(connection, sophia, mint, sophia.publicKey);
-    await mintTo(connection, sophia, mint, sophiaATA.address, sophia, 1_000_000 * 1_000_000); // 1M with 6 decimals
-    console.log('✓ 1,000,000 USDC Minted!');
-  } catch (e: any) {
-    console.warn(`⚠️ Warning: Mock USDC setup failed (needs SOL): ${e.message}`);
-  }
+  // Using Circle's official Devnet USDC: 4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU
 
   // 5. Append to .env.local
   const envVars = `\n
@@ -58,7 +44,7 @@ async function main() {
 AGENT_SOPHIA_PRIVKEY=${bs58.encode(sophia.secretKey)}
 COUNTERPARTY_ALPHA_PUBKEY=${alphaCounterparty.publicKey.toBase58()}
 COUNTERPARTY_BETA_PUBKEY=${betaCounterparty.publicKey.toBase58()}
-USDC_DEVNET_MINT=${mint ? mint.toBase58() : 'Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr'}
+USDC_DEVNET_MINT=4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU
 `;
 
   fs.appendFileSync('.env.local', envVars);

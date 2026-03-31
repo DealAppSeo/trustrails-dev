@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify({
       agentName:         'SOPHIA',
       amountUSDC:        25000,
-      recipientAddress:  process.env.COUNTERPARTY_ALPHA_PUBKEY || 'dummy123',
+      recipientAddress:  'NEXUS',
       purpose:           'institutional_treasury_rebalance',
     }),
   });

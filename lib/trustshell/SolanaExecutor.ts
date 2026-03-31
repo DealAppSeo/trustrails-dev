@@ -13,7 +13,7 @@ export class SolanaExecutor {
     'confirmed'
   );
   private usdcMint = new PublicKey(
-    process.env.USDC_DEVNET_MINT || 'Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr'
+    process.env.USDC_DEVNET_MINT || '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU'
   );
   private MEMO_PROGRAM = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
 
@@ -33,34 +33,42 @@ export class SolanaExecutor {
     }
   ): Promise<{ txHash: string; explorerUrl: string }> {
 
-    const privKeyStr = process.env.AGENT_SOPHIA_PRIVKEY;
-    if (!privKeyStr) throw new Error("Missing AGENT_SOPHIA_PRIVKEY in environment");
+    let privKeyStr = process.env.AGENT_SOPHIA_PRIVKEY;
+    if (complianceData.agentName === 'SOPHIA') {
+      privKeyStr = process.env.SOPHIA_SOLANA_PRIVATE_KEY || privKeyStr;
+    }
+    if (!privKeyStr) throw new Error("Missing sender private key in environment");
+
+    let finalToAddress = toAddress;
+    let recipientName = toAddress.slice(0, 8);
+    let recipientRepid = 0;
+
+    if (toAddress === 'NEXUS') {
+      finalToAddress = process.env.NEXUS_SOLANA_ADDRESS || 'mkxYpeHVaH3zychKcBsoLG53MwNnFkmFfeqDDDeCFKT';
+      recipientName = 'NEXUS';
+      recipientRepid = 2658;
+    }
     
     const secretKey = bs58.decode(privKeyStr);
     const signer = Keypair.fromSecretKey(secretKey);
       
-      const toKey   = new PublicKey(toAddress);
+    const toKey   = new PublicKey(finalToAddress);
       
-      const transferIx = SystemProgram.transfer({
-        fromPubkey: signer.publicKey,
-        toPubkey: toKey,
-        lamports: 1000,
-      });
+    const transferIx = SystemProgram.transfer({
+      fromPubkey: signer.publicKey,
+      toPubkey: toKey,
+      lamports: 1000, // 1000 lamports for demo compliance anchor
+    });
 
-      // TrustShell compliance memo — on-chain proof
-      // Compact format: every field is a compliance signal for the audit trail
-      const memo = JSON.stringify({
-        ts:  1,                                    // TrustShell protocol version
-        rid: complianceData.receiptId,             // KYA receipt ID
-        ag:  complianceData.agentName,             // Agent name
-        rep: complianceData.repidScore,            // RepID at execution
-        bft: complianceData.bftPassed ? 1 : 0,    // BFT consensus passed
-        bfw: Number(complianceData.bftWeight.toFixed(3)), // Consensus weight
-        zkp: complianceData.zkpProofCID.slice(-8), // Last 8 chars of ZKP CID
-        rh:  complianceData.ruleHash.slice(0, 8),  // First 8 chars of rule hash
-        ins: complianceData.insuranceCoverage,     // Insurance coverage USD
-        t:   Date.now(),                           // Unix timestamp
-      });
+    const memo = JSON.stringify({
+      ag:    complianceData.agentName,
+      to:    recipientName,
+      rep_s: complianceData.repidScore,
+      rep_r: recipientRepid,
+      bft:   complianceData.bftPassed ? 1 : 0,
+      zkp:   complianceData.zkpProofCID.slice(-8),
+      t:     Date.now()
+    });
 
       const memoIx = new TransactionInstruction({
         keys:      [],
