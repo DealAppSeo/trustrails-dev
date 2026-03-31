@@ -80,15 +80,40 @@ export default function Dashboard() {
     }, 2000);
   };
 
-  const handleComplianceDemo = () => {
+  const [demoLoading, setDemoLoading] = useState(false);
+  const [demoError, setDemoError] = useState('');
+  const [liveTxHash, setLiveTxHash] = useState('');
+  const [liveExplorerUrl, setLiveExplorerUrl] = useState('');
+
+  const handleComplianceDemo = async () => {
+    setDemoError('');
+    setDemoLoading(true);
     setDemoStateR(1);
     setRevealRA(false); setRevealRB(false); setRevealRC(false);
-    setTimeout(() => {
+    
+    try {
+      const res = await fetch('/api/trustrails/pay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agentName: 'SOPHIA', recipientAddress: 'NEXUS', amountUSDC: 25000, purpose: 'institutional_treasury_rebalance' })
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.reason || data.message || data.error || 'Payment execution failed');
+      
+      setLiveTxHash(data.receipt?.solanaTxHash || '');
+      setLiveExplorerUrl(data.explorerUrl || '');
+
       setDemoStateR(2);
-      setTimeout(() => setRevealRA(true), 1500);
-      setTimeout(() => setRevealRB(true), 3000);
-      setTimeout(() => setRevealRC(true), 4500);
-    }, 2000);
+      setTimeout(() => setRevealRA(true), 500);
+      setTimeout(() => setRevealRB(true), 2000);
+      setTimeout(() => setRevealRC(true), 3500);
+    } catch (err: any) {
+      console.error(err);
+      setDemoError(err.message);
+    } finally {
+      setDemoLoading(false);
+    }
   };
 
   // --- UI Helpers ---
@@ -382,10 +407,12 @@ export default function Dashboard() {
           <div>
             <button 
               onClick={handleComplianceDemo} 
-              style={{ width: '100%', padding: '16px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', marginBottom: '24px', display: 'flex', justifyContent: 'center', gap: '8px' }}
+              disabled={demoLoading}
+              style={{ width: '100%', padding: '16px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '16px', fontWeight: 'bold', cursor: demoLoading ? 'not-allowed' : 'pointer', marginBottom: '24px', display: 'flex', justifyContent: 'center', gap: '8px', opacity: demoLoading ? 0.7 : 1 }}
             >
-              ✅ Run Compliance Demo
+              {demoLoading ? '⏳ Processing...' : '✅ Run Compliance Demo'}
             </button>
+            {demoError && <div style={{color: '#fca5a5', marginBottom: 16, textAlign: 'center', fontWeight: 'bold'}}>⚠️ {demoError}</div>}
 
             {demoStateR === 1 && (
               <div style={{ fontFamily: 'monospace', color: '#60a5fa', marginBottom: '24px', padding: '16px', background: '#020617', borderRadius: '6px' }}>
@@ -420,7 +447,7 @@ export default function Dashboard() {
                         Combined: 94% — Passes 66.7% threshold<br/><br/>
                         Custodian liability: Qualified Investor (ZKP-verified)<br/>
                         Human identity: Proven, not revealed.<br/>
-                        Solana Tx: <a href={`https://explorer.solana.com/tx/${getHash(1)}?cluster=devnet`} target="_blank" rel="noopener" style={{color: '#60a5fa'}} title={getHash(1)}>{truncate(getHash(1))}</a><br/>
+                        Solana Tx: <a href={liveExplorerUrl || `https://explorer.solana.com/tx/${getHash(1)}?cluster=devnet`} target="_blank" rel="noopener" style={{color: '#60a5fa'}} title={liveTxHash || getHash(1)}>{truncate(liveTxHash || getHash(1))}</a><br/>
                         Memo field: compliance_hash + RepID + BFT weight<br/>
                         Regulators can verify independently — without us.<br/>
                         ZKP Proof: zk_proof_bafybeig...<br/>

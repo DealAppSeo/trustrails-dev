@@ -4,7 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
   KYAValidator, BFTAuthorizer, ComplianceReceiptGenerator,
-  SolanaExecutor, FireblocksPreAuth,
+  SolanaExecutor,
   ZKPAttestationService, RepIDCalculator
 } from '@/lib/trustshell';
 
@@ -15,7 +15,6 @@ export async function POST(req: NextRequest) {
   const bft        = new BFTAuthorizer();
   const receipts   = new ComplianceReceiptGenerator();
   const solana     = new SolanaExecutor();
-  const fireblocks = new FireblocksPreAuth();
   const zkp        = new ZKPAttestationService();
   const calc       = new RepIDCalculator();
 
@@ -119,8 +118,7 @@ export async function POST(req: NextRequest) {
       solanaTxHash: txHash, solanaExplorerUrl: explorerUrl, ruleHash,
     });
 
-    // Step 5: Fireblocks Pre-Auth (demonstrates architecture)
-    const fbPreAuth = await fireblocks.generatePreAuth(receipt);
+    // Fireblocks integration: architecture ready, credentials pending.
 
     // Step 6: Update RepID (reward successful compliance)
     await kya.updateRepID(agentName, 10, `Successful compliant payment: ${amountUSDC} USDC`);
@@ -128,7 +126,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       approved:     true,
       receipt,
-      fireblocksPreAuth: fbPreAuth,
       explorerUrl,
       message: `KYA-verified payment of ${amountUSDC} USDC executed by ${agentName} (RepID: ${kyaResult.repidScore})`,
     });
