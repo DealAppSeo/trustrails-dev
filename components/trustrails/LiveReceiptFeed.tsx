@@ -106,9 +106,9 @@ export function LiveReceiptFeed() {
                   </span>
                 )}
                 {r.solana_tx_hash && (
-                  <span style={{ background: '#0f172a', padding: '2px 6px', borderRadius: 4, color: '#a78bfa', fontSize: 13 }}>
+                  <a href={`https://explorer.solana.com/tx/${r.solana_tx_hash}?cluster=devnet`} target="_blank" rel="noopener noreferrer" style={{ background: '#0f172a', padding: '2px 6px', borderRadius: 4, color: '#a78bfa', fontSize: 13, textDecoration: 'none' }}>
                     Tx: {r.solana_tx_hash.slice(0, 8)}...
-                  </span>
+                  </a>
                 )}
                 <span style={{ background: '#0f172a', padding: '2px 6px', borderRadius: 4, color: '#cbd5e1', fontSize: 13 }}>
                   BFT: {r.bft_consensus_weight ? Math.round(r.bft_consensus_weight) : 89}%
