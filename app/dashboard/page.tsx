@@ -13,6 +13,13 @@ interface DashData {
 }
 
 export default function Dashboard() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile(); // Check on mount
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   const [profile, setProfile] = useState<'conservative' | 'balanced' | 'aggressive'>('balanced');
   const [demoStateL, setDemoStateL] = useState(0); // 0=idle, 1=scanning, 2=cards
   const [demoStateR, setDemoStateR] = useState(0); // 0=idle, 1=scanning, 2=cards
@@ -163,7 +170,7 @@ export default function Dashboard() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', fontSize: '18px', fontWeight: 'bold' }}>
             🏦 Institutional Risk Profile
           </div>
-          <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
             {[
               { id: 'conservative', label: 'Conservative (MiCA/AMINA)' },
               { id: 'balanced', label: 'Balanced' },
@@ -177,7 +184,8 @@ export default function Dashboard() {
                   color: profile === p.id ? '#fff' : '#94a3b8',
                   border: `1px solid ${profile === p.id ? '#1d4ed8' : '#8b9ab0'}`,
                   padding: '8px 16px', borderRadius: '24px', cursor: 'pointer',
-                  fontSize: '15px', fontWeight: 'bold', transition: 'all 0.2s'
+                  fontSize: '16px', fontWeight: 'bold', transition: 'all 0.2s',
+                  minHeight: '48px', minWidth: '140px'
                 }}
               >
                 {profile === p.id ? '●' : '○'} {p.label}
@@ -191,7 +199,7 @@ export default function Dashboard() {
         </div>
 
         {/* COLUMNS */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '32px', marginBottom: '40px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 1fr) minmax(0, 1fr)', gap: '32px', marginBottom: '40px' }}>
           
           {/* COMPONENT B: GUARDRAIL DEMO */}
           <div>
@@ -569,8 +577,8 @@ export default function Dashboard() {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 80px 1fr 80px 1fr',
-            gap: '0',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 80px 1fr 80px 1fr',
+            gap: isMobile ? '16px' : '0',
             alignItems: 'stretch'
           }}>
 
@@ -644,7 +652,7 @@ export default function Dashboard() {
                 </svg>
                 <div style={{ fontSize: '20px', color: '#93c5fd', fontWeight: 'bold', fontFamily: 'monospace' }}>4FA</div>
                 <div style={{ fontSize: '13px', color: '#60a5fa', fontFamily: 'monospace' }}>Verify<br/>Human</div>
-                <div style={{ color: '#60a5fa', fontSize: '28px', lineHeight: '1' }}>→</div>
+                <div style={{ color: '#60a5fa', fontSize: '28px', lineHeight: '1' }}>{isMobile ? '↓' : '→'}</div>
               </div>
             </div>
 
@@ -714,7 +722,7 @@ export default function Dashboard() {
                 </svg>
                 <div style={{ fontSize: '20px', color: '#4ade80', fontWeight: 'bold', fontFamily: 'monospace' }}>ZKP</div>
                 <div style={{ fontSize: '13px', color: '#34d399', fontFamily: 'monospace' }}>Bond<br/>Links</div>
-                <div style={{ color: '#4ade80', fontSize: '28px', lineHeight: '1' }}>⛓</div>
+                <div style={{ color: '#4ade80', fontSize: '28px', lineHeight: '1' }}>{isMobile ? '↓' : '⛓'}</div>
               </div>
             </div>
 
