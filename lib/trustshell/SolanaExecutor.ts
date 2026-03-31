@@ -65,7 +65,7 @@ export class SolanaExecutor {
     const transferIx = SystemProgram.transfer({
       fromPubkey: signer.publicKey,
       toPubkey: toKey,
-      lamports: 1000, // 1000 lamports for demo compliance anchor
+      lamports: 1000000, 
     });
 
     const memo = JSON.stringify({
