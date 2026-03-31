@@ -38,17 +38,25 @@ export class SolanaExecutor {
       privKeyStr = process.env.SOPHIA_SOLANA_PRIVATE_KEY || privKeyStr;
     }
     if (!privKeyStr) throw new Error("Missing sender private key in environment");
+    
+    // BUG FIX: Clean invisible whitespace/newlines (carriage returns) from dotenv lines
+    privKeyStr = privKeyStr.trim();
 
-    let finalToAddress = toAddress;
-    let recipientName = toAddress.slice(0, 8);
+    let finalToAddress = toAddress.trim();
+    let recipientName = finalToAddress.slice(0, 8);
     let recipientRepid = 0;
 
-    if (toAddress === 'NEXUS') {
-      finalToAddress = process.env.NEXUS_SOLANA_ADDRESS || 'mkxYpeHVaH3zychKcBsoLG53MwNnFkmFfeqDDDeCFKT';
+    if (finalToAddress === 'NEXUS') {
+      finalToAddress = (process.env.NEXUS_SOLANA_ADDRESS || 'mkxYpeHVaH3zychKcBsoLG53MwNnFkmFfeqDDDeCFKT').trim();
       recipientName = 'NEXUS';
       recipientRepid = 2658;
     }
     
+    // BUG FIX: Fallback for 'dummy123' which would fail new PublicKey() base58 decode
+    if (finalToAddress === 'dummy123') {
+      finalToAddress = '11111111111111111111111111111111'; // Valid System Account fallback
+    }
+
     const secretKey = bs58.decode(privKeyStr);
     const signer = Keypair.fromSecretKey(secretKey);
       

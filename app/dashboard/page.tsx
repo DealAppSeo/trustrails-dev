@@ -416,7 +416,7 @@ export default function Dashboard() {
 
             {demoStateR === 1 && (
               <div style={{ fontFamily: 'monospace', color: '#60a5fa', marginBottom: '24px', padding: '16px', background: '#020617', borderRadius: '6px' }}>
-                <TypeText text="Initializing compliance workflow test sequence...\nConnecting to HyperDAG validators..." time={20} />
+                <TypeText text="Initializing compliance workflow test sequence...\nConnecting to TrustRails compliance network..." time={20} />
               </div>
             )}
 
