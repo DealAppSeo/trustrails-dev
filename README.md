@@ -302,7 +302,7 @@ Configure per deployment:
 | Repo | Description |
 |---|---|
 | [trustrails-dev](https://github.com/DealAppSeo/trustrails-dev) | This repo — TrustRails dashboard and API |
-| [hyperdag-protocol](https://github.com/DealAppSeo/hyperdag-protocol) | HyperDAG Protocol — identity, ZKP, DAG infrastructure |
+| `hyperdag-protocol` | HyperDAG Protocol — identity, ZKP, DAG infrastructure |
 
 *Additional private repositories exist for the AI Trinity Symphony agent swarm and enterprise platform.*
 
@@ -358,8 +358,8 @@ TrustRails is one application built on a layered infrastructure stack. The full 
 
 | System | Repos | Status |
 |---|---|---|
-| AI Trinity Symphony | `trinity-symphony-shared` (public) + `trinity-ecosystem` (private) | 12 agents live on Railway |
-| HyperDAG Protocol | [`hyperdag-protocol`](https://github.com/DealAppSeo/hyperdag-protocol) (public) + `hyperdag-platform` (private) | ERC-8004 contracts live on Base Sepolia |
+| AI Trinity Symphony | [trinity-symphony-shared](https://github.com/DealAppSeo/trinity-symphony-shared) (public) + `trinity-ecosystem` (private) | 12 agents live on Railway |
+| HyperDAG Protocol | `hyperdag-protocol` (private) + `hyperdag-platform` (private) | ERC-8004 contracts live on Base Sepolia |
 
 The private repos contain the agent orchestration engine, constitutional agent framework, ANFIS routing layer, and enterprise platform. The public repos expose the interfaces, shared utilities, and protocol specifications.
 
