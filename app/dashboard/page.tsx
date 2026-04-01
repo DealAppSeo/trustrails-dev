@@ -41,6 +41,44 @@ export default function Dashboard() {
   const [demoStateR, setDemoStateR] = useState(0); // 0=idle, 1=scanning, 2=cards
   const [data, setData] = useState<DashData | null>(null);
   
+  const [realStats, setRealStats] = useState({
+    agentsOnline: 0,
+    lastBft: '',
+    loaded: false
+  });
+
+  useEffect(() => {
+    async function fetchRealStats() {
+      try {
+        const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+        const { count: active } = await supabase
+          .from('agent_heartbeat')
+          .select('*', { count: 'exact', head: true })
+          .gt('last_ping', fiveMinsAgo);
+
+        const { data: latestBft } = await supabase
+          .from('trinity_heartbeat')
+          .select('last_seen')
+          .order('last_seen', { ascending: false })
+          .limit(1)
+          .single();
+
+        setRealStats({
+          agentsOnline: active || 0,
+          lastBft: latestBft?.last_seen ? new Date(latestBft.last_seen).toLocaleTimeString() : '',
+          loaded: true
+        });
+      } catch (err) {
+        console.error('Failed to load real stats:', err);
+      }
+    }
+    fetchRealStats();
+    
+    // Poll every 30 seconds
+    const interval = setInterval(fetchRealStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
+  
   // Staggered reveals for cards
   const [revealLA, setRevealLA] = useState(false);
   const [revealLB, setRevealLB] = useState(false);
@@ -57,9 +95,8 @@ export default function Dashboard() {
       .catch(console.error);
   }, []);
 
-  const stats = data?.stats || { receiptCount: 0, volumeProtected: 0, lastBft: new Date().toISOString(), hallucinationCatchRate: '0%' };
+  const stats = data?.stats || { receiptCount: 0, volumeProtected: 0, lastBft: new Date().toISOString() };
   const agents = data?.agents || [];
-  const onlineAgents = agents.length > 0 ? agents.length : 12;
 
   const getHash = (idx: number) => {
     if (data && data.receipts && data.receipts[idx]) {
@@ -186,19 +223,19 @@ export default function Dashboard() {
       <div style={{ background: '#0f172a', borderBottom: '1px solid #1e293b', padding: '8px 16px', fontSize: '14px', display: 'flex', justifyContent: 'center', gap: '24px', fontFamily: 'monospace', color: '#94a3b8', flexWrap: 'wrap' }}>
         <span>LIVE SYSTEM STATUS</span>
         <span>·</span>
-        <span style={{color: '#60a5fa'}}>Agents: {onlineAgents} online</span>
-        <span>·</span>
-        <span style={{color: '#4ade80'}}>Uptime: 99.9%</span>
+        <span style={{color: '#60a5fa'}}>Agents: {realStats.loaded ? realStats.agentsOnline : '...'} online</span>
         <span>·</span>
         <span>Receipts today: {stats.receiptCount}</span>
         <span>·</span>
         <span>Volume protected: ${stats.volumeProtected.toLocaleString()}</span>
+        {realStats.lastBft && (
+          <>
+            <span>·</span>
+            <span>Last BFT: {realStats.lastBft}</span>
+          </>
+        )}
         <span>·</span>
-        <span>Last BFT: {new Date(stats.lastBft).toLocaleTimeString()}</span>
-        <span>·</span>
-        <span>Hallucination catch rate: {stats.hallucinationCatchRate}</span>
-        <span>·</span>
-        <span>Solana TPS available: 65,000</span>
+        <span>Solana capacity: 65,000 TPS</span>
       </div>
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 16px' }}>
