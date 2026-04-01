@@ -82,6 +82,22 @@ export default function Home() {
           Solana Devnet, zero-knowledge proofs, and BFT consensus.
         </p>
 
+        <div style={{ marginTop: '40px' }}>
+          <Link href="/demo" style={{
+            display: 'inline-block',
+            background: 'linear-gradient(to right, #10b981, #059669)',
+            color: '#ffffff',
+            fontWeight: 'bold',
+            fontSize: '18px',
+            padding: '16px 32px',
+            borderRadius: '12px',
+            textDecoration: 'none',
+            boxShadow: '0 4px 14px 0 rgba(16, 185, 129, 0.39)',
+            transition: 'transform 0.2s ease',
+          }}>
+            Live Trust Ceremony Demo →
+          </Link>
+        </div>
 
       </main>
 
