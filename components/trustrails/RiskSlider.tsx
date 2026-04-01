@@ -4,20 +4,36 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
-const PRESETS = {
-  'AMINA Conservative (MiCA)': { bftAccuracy: 0.20, veritasCatchRate: 0.20, x402SuccessRate: 0.10, latencyOpportunity: 0.05, humanCustodyScore: 0.45 },
-  'Balanced Portfolio':         { bftAccuracy: 0.35, veritasCatchRate: 0.25, x402SuccessRate: 0.25, latencyOpportunity: 0.10, humanCustodyScore: 0.05 },
-  'Default TrustRails':         { bftAccuracy: 0.40, veritasCatchRate: 0.30, x402SuccessRate: 0.15, latencyOpportunity: 0.10, humanCustodyScore: 0.05 },
+const labelMap: Record<string, string> = {
+  'Default TrustRails': 'Balanced',
+  'AMINA Bank Conservative': 'Conservative',
+  'Portfolio Manager Balanced': 'Aggressive'
 };
 
 export function RiskSlider({ onRepIDChange }: { onRepIDChange?: (score: number) => void }) {
-  // @ts-ignore
-  const [weights, setWeights] = useState(PRESETS['Default TrustRails']);
+  const [weights, setWeights] = useState<Record<string, number> | null>(null);
+  const [presets, setPresets] = useState<any[]>([]);
+  const [activePreset, setActivePreset] = useState<string>('Balanced');
+  
   const [sophiaRepID, setSophiaRepID] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  useEffect(() => {
+    supabase.from('institution_risk_config')
+      .select('institution_name, min_repid_payment, min_repid_vault, repid_weights')
+      .then(({data, error}) => {
+        if (data && data.length > 0) {
+          setPresets(data);
+          const defaultPreset = data.find(d => labelMap[d.institution_name] === 'Balanced') || data[0];
+          setActivePreset(labelMap[defaultPreset.institution_name] || defaultPreset.institution_name);
+          setWeights(defaultPreset.repid_weights);
+        }
+      });
+  }, []);
 
   const apply = async () => {
     setLoading(true);
@@ -73,17 +89,28 @@ export function RiskSlider({ onRepIDChange }: { onRepIDChange?: (score: number) 
 
       {/* Presets */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
-        {Object.entries(PRESETS).map(([label, preset]) => (
-          <button key={label}
-            onClick={() => setWeights(preset)}
-            style={{ background: '#0f172a', color: '#94a3b8', border: '1px solid #8b9ab0', borderRadius: 6, padding: '4px 12px', fontSize: 13, cursor: 'pointer' }}>
-            {label}
-          </button>
-        ))}
+        {presets.map((preset) => {
+          const uiLabel = labelMap[preset.institution_name] || preset.institution_name;
+          return (
+            <button key={preset.institution_name}
+              onClick={() => {
+                setActivePreset(uiLabel);
+                setWeights(preset.repid_weights);
+              }}
+              style={{ 
+                background: activePreset === uiLabel ? '#1d4ed8' : '#0f172a', 
+                color: activePreset === uiLabel ? '#fff' : '#94a3b8', 
+                border: activePreset === uiLabel ? '1px solid #1d4ed8' : '1px solid #8b9ab0', 
+                borderRadius: 6, padding: '4px 12px', fontSize: 13, cursor: 'pointer' 
+              }}>
+              {uiLabel}
+            </button>
+          );
+        })}
       </div>
 
       {/* Sliders */}
-      {Object.entries(weights).map(([key, val]) => (
+      {weights && Object.entries(weights).map(([key, val]) => (
         <div key={key} style={{ marginBottom: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
             <span style={{ color: '#94a3b8', fontSize: 13 }}>
@@ -102,7 +129,7 @@ export function RiskSlider({ onRepIDChange }: { onRepIDChange?: (score: number) 
       ))}
 
       {/* Weight sum warning */}
-      {Math.abs(Object.values(weights).reduce((s, v) => s + v, 0) - 1.0) > 0.01 && (
+      {weights && Math.abs(Object.values(weights).reduce((s, v) => s + v, 0) - 1.0) > 0.01 && (
         <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 12 }}>
           ⚠️ Weights must sum to 100%. Current: {(Object.values(weights).reduce((s, v) => s + v, 0) * 100).toFixed(0)}%
         </p>

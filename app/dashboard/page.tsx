@@ -21,10 +21,10 @@ export default function Dashboard() {
   const [sophiaLiveRepId, setSophiaLiveRepId] = useState('8,590');
   useEffect(() => {
     if(supabaseUrl) {
-      supabase.from('trinity_agent_registry').select('reputation_score').eq('agent_name', 'trinity-sophia').single()
+      supabase.from('agent_repid').select('repid_score').eq('agent_name', 'trinity-sophia').single()
         .then(({data}) => {
-          if (data && data.reputation_score) {
-            setSophiaLiveRepId(Math.round(data.reputation_score * 100).toLocaleString());
+          if (data && data.repid_score) {
+            setSophiaLiveRepId(Math.round(data.repid_score * 100).toLocaleString());
           }
         });
     }
@@ -44,6 +44,7 @@ export default function Dashboard() {
   const [realStats, setRealStats] = useState({
     agentsOnline: 0,
     lastBft: '',
+    hallucinationRate: '',
     loaded: false
   });
 
@@ -63,9 +64,19 @@ export default function Dashboard() {
           .limit(1)
           .single();
 
+        const { count: totalLogs } = await supabase
+          .from('trinity_hallucination_logs')
+          .select('*', { count: 'exact', head: true });
+          
+        const { count: vetoedLogs } = await supabase
+          .from('trinity_hallucination_logs')
+          .select('*', { count: 'exact', head: true })
+          .not('veto_reason', 'is', null);
+
         setRealStats({
           agentsOnline: active || 0,
           lastBft: latestBft?.last_seen ? new Date(latestBft.last_seen).toLocaleTimeString() : '',
+          hallucinationRate: totalLogs && totalLogs > 0 ? `${(((vetoedLogs || 0) / totalLogs) * 100).toFixed(1)}%` : '',
           loaded: true
         });
       } catch (err) {
@@ -232,6 +243,12 @@ export default function Dashboard() {
           <>
             <span>·</span>
             <span>Last BFT: {realStats.lastBft}</span>
+          </>
+        )}
+        {realStats.hallucinationRate && (
+          <>
+            <span>·</span>
+            <span style={{color: '#fcd34d'}}>Hallucination catch rate: {realStats.hallucinationRate}</span>
           </>
         )}
         <span>·</span>
