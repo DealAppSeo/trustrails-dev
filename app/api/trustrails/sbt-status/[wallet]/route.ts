@@ -6,9 +6,6 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function GET(req: Request, { params }: { params: { wallet: string } }) {
-  if (req.method === 'GET') {
-    // Allow public read — no auth required for demo
-  }
   try {
     const { wallet } = params;
 

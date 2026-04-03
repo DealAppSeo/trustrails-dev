@@ -1,0 +1,39 @@
+{
+  "approved": true,
+  "receipt": {
+    "receiptId": "704eac02-36ed-42a2-a2e9-96f0858d9611",
+    "agentName": "SOPHIA",
+    "agentRepidScore": 3971,
+    "agentRepidTier": "Platinum",
+    "paymentAmountUSDC": 25000,
+    "recipientAddress": "NEXUS",
+    "kyaVerified": true,
+    "zkpProofCID": "QmMDFiODkyNDc3OGU4NjBlYTQ2OTgwYjc1NTA4MjRiYmZl",
+    "humanCustodyBound": true,
+    "bftProof": {
+      "paymentId": "44906a1a-4b4e-4221-b9fd-4a4c7266fb30",
+      "votesFor": [
+        "VERITAS",
+        "SHOFET",
+        "SOPHIA"
+      ],
+      "votesAgainst": [],
+      "consensusWeight": 1,
+      "threshold": 0.667,
+      "passed": true,
+      "pythagoreanVeto": false,
+      "votedAt": "2026-03-31T06:38:58.424Z"
+    },
+    "withinDailyLimit": true,
+    "withinTxLimit": true,
+    "ruleHash": "6c705fec515b7d065dd1381ae77e53c05dc204746b523759aeb9486e0ed760aa",
+    "insuranceCoverage": 250000,
+    "solanaExplorerUrl": "https://explorer.solana.com/tx/36TB56cWqA3Z3PeQMJ4x3PvvLn1UjneZLdi2yjNaMNdWXQEaFBRDPkVNDfgLf56sn277JwB5v68SdiAJRjnJmNxG?cluster=devnet",
+    "solanaTxHash": "36TB56cWqA3Z3PeQMJ4x3PvvLn1UjneZLdi2yjNaMNdWXQEaFBRDPkVNDfgLf56sn277JwB5v68SdiAJRjnJmNxG",
+    "fireblocksPreAuthId": "FB-PREAUTH-704EAC02",
+    "auditHash": "d78e3d283520e9560c962c7aa5c23436302d32717668e78a2158b08bb7bf927e",
+    "createdAt": "2026-03-31T06:39:12.076Z"
+  },
+  "explorerUrl": "https://explorer.solana.com/tx/36TB56cWqA3Z3PeQMJ4x3PvvLn1UjneZLdi2yjNaMNdWXQEaFBRDPkVNDfgLf56sn277JwB5v68SdiAJRjnJmNxG?cluster=devnet",
+  "message": "KYA-verified payment of 25000 USDC executed by SOPHIA (RepID: 3971)"
+}
