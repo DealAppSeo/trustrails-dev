@@ -1,216 +1,236 @@
 'use client';
+import { useState, useEffect } from 'react';
+import { ethers } from 'ethers';
 
-import React, { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { Shield, ShieldAlert, Link as LinkIcon, Unlink, Activity } from 'lucide-react';
+export default function DemoPage() {
+  const [wallet, setWallet] = useState('');
+  const [dbtTokenId, setDbtTokenId] = useState('');
+  const [emailOtp, setEmailOtp] = useState('');
+  const [smsOtp, setSmsOtp] = useState('');
+  const [events, setEvents] = useState<any[]>([]);
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [factorsVerified, setFactorsVerified] = useState(0);
+  const [sbtResult, setSbtResult] = useState<any>(null);
 
-type Score = { rep_score: number; display_name: string; identity_type: string };
-type Event = { id: string; event_type: string; target_address: string; details: any; tx_hash: string; created_at: string };
-
-export default function TrustCeremonyDemo() {
-  const [seanScore, setSeanScore] = useState<number>(75);
-  const [melScore, setMelScore] = useState<number>(45);
-  const [sophiaScore, setSophiaScore] = useState<number>(52);
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState<string | null>(null);
-  const [errorToast, setErrorToast] = useState<string | null>(null);
-
-  const fetchScores = async () => {
-    const urls = ['sean.sbt', 'mel.agent', 'sophia.agent'];
-    for (const addr of urls) {
-      try {
-        const res = await fetch(`/api/repid/${addr}`);
-        const data = await res.json();
-        if (data.rep_score) {
-          if (addr === 'sean.sbt') setSeanScore(Number(data.rep_score));
-          if (addr === 'mel.agent') setMelScore(Number(data.rep_score));
-          if (addr === 'sophia.agent') setSophiaScore(Number(data.rep_score));
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  };
-
-  const fetchEvents = async () => {
-    try {
-      const res = await fetch('/api/trust-events');
-      const data = await res.json();
-      if (Array.isArray(data)) setEvents(data);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
+  // Poll trust_events every 3s
   useEffect(() => {
-    fetchScores();
-    fetchEvents();
-
-    const channel = supabase
-      .channel('schema-db-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'repid_scores' },
-        () => fetchScores()
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'trust_events' },
-        () => fetchEvents()
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch('/api/trustrails/trust-events?limit=20');
+        if (res.ok) {
+          const data = await res.json();
+          setEvents(data.events);
+        }
+      } catch (err) {}
     };
+    fetchEvents();
+    const interval = setInterval(fetchEvents, 3000);
+    return () => clearInterval(interval);
   }, []);
 
-  const handleAction = async (actionId: string, url: string, body: any) => {
-    setLoading(actionId);
-    setErrorToast(null);
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Action failed');
-      }
-      // Scores update automatically via Supabase realtime subscription
-    } catch (e: any) {
-      setErrorToast(e.message);
-      setTimeout(() => setErrorToast(null), 5000);
-    } finally {
-      setLoading(null);
+  const initiatePol = async () => {
+    setLoading(true);
+    const res = await fetch('/api/trustrails/initiate-pol', {
+      method: 'POST',
+      body: JSON.stringify({ wallet_address: wallet })
+    });
+    const data = await res.json();
+    setLoading(false);
+    if (res.ok) {
+      setDbtTokenId(data.dbt_token_id);
+      setStep(2);
+    } else {
+      alert(data.error);
     }
   };
 
-  const IdentityCard = ({ name, type, score, color }: { name: string, type: string, score: number, color: string }) => (
-    <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl flex flex-col items-center shadow-lg transform transition-all hover:scale-105">
-      <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${color}`}>
-        {type === 'SBT' ? <Shield className="w-8 h-8 text-white" /> : <Activity className="w-8 h-8 text-white" />}
-      </div>
-      <h3 className="text-xl font-bold text-white mb-1">{name}</h3>
-      <span className="px-3 py-1 bg-slate-800 text-xs font-semibold rounded-full text-slate-400 mb-4">{type} Identity</span>
-      <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400">
-        {score} <span className="text-sm font-medium text-slate-500">RepID</span>
-      </div>
-    </div>
-  );
+  const verifyFactor = async (type: string, value: string) => {
+    setLoading(true);
+    const res = await fetch('/api/trustrails/verify-factor', {
+      method: 'POST',
+      body: JSON.stringify({ dbt_token_id: dbtTokenId, factor_type: type, value })
+    });
+    const data = await res.json();
+    setLoading(false);
+    
+    if (res.ok) {
+      setFactorsVerified(data.factors_verified);
+      if (data.complete) {
+        setSbtResult(data);
+        generateReceipt(data.sbt_token_id);
+        setStep(6);
+      } else {
+        if (type === 'email') setStep(3);
+        if (type === 'sms') setStep(4);
+        if (type === 'biometric') setStep(5);
+      }
+    } else {
+      alert(data.error);
+    }
+  };
+
+  const verifyWalletSig = async () => {
+    if (!(window as any).ethereum) {
+      alert('MetaMask not found');
+      return;
+    }
+    setLoading(true);
+    try {
+      const provider = new ethers.BrowserProvider((window as any).ethereum);
+      const signer = await provider.getSigner();
+      const timestamp = Date.now();
+      const message = `TrustRails PoL verification | ${dbtTokenId} | ${timestamp}`;
+      const signature = await signer.signMessage(message);
+      
+      await verifyFactor('wallet_sig', { signature, message });
+    } catch (err: any) {
+      alert(err.message);
+      setLoading(false);
+    }
+  };
+
+  const generateReceipt = async (sbt_token_id: string) => {
+    const res = await fetch('/api/trustrails/generate-compliance-receipt', {
+      method: 'POST',
+      body: JSON.stringify({
+        sbt_token_id,
+        agent_id: 'TRINITY-DEMO',
+        transaction_type: 'POL_ONBOARDING',
+        amount_usdc: 100 // dummy test value
+      })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setSbtResult((prev: any) => ({ ...prev, receipt_id: data.receipt_id }));
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-8 font-sans">
-      <div className="max-w-6xl mx-auto space-y-12">
-        <header className="border-b border-slate-800 pb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-black text-white tracking-tight flex items-center gap-3">
-              <ShieldAlert className="w-10 h-10 text-emerald-500" />
-              Live Trust Ceremony
-            </h1>
-            <p className="text-slate-400 mt-2 text-lg">Real-time KYA Verification and RepID Propagation via HyperDAG</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-            </span>
-            <span className="text-sm font-bold text-emerald-500 tracking-wider">LIVE NETWORK</span>
-          </div>
-        </header>
-
-        {errorToast && (
-          <div className="bg-red-900/50 border border-red-500/50 text-red-200 p-4 rounded-lg flex items-center shadow-xl animate-in slide-in-from-top-2">
-            <ShieldAlert className="w-5 h-5 mr-3 text-red-400" />
-            <span className="font-semibold">{errorToast}</span>
+    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'sans-serif', backgroundColor: '#111', color: '#fff' }}>
+      
+      {/* LEFT COLUMN: WIZARD */}
+      <div style={{ flex: 1, padding: '40px', borderRight: '1px solid #333' }}>
+        <h1 style={{ fontSize: '24px', marginBottom: '30px', color: '#4ADE80' }}>TrustRails PoL Verification Wizard</h1>
+        
+        {step === 1 && (
+          <div style={{ padding: '20px', backgroundColor: '#222', borderRadius: '8px' }}>
+            <h2>[1] Initiate PoL</h2>
+            <p style={{ color: '#aaa', marginBottom: '15px' }}>Enter wallet address to begin proof of life verification.</p>
+            <input 
+              value={wallet} 
+              onChange={e => setWallet(e.target.value)} 
+              placeholder="0x..." 
+              style={{ padding: '10px', width: '100%', marginBottom: '15px', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '4px' }}
+            />
+            <button 
+              onClick={initiatePol} 
+              disabled={loading || !wallet}
+              style={{ padding: '10px 20px', backgroundColor: '#4ADE80', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              {loading ? 'Initializing...' : 'Start Verification'}
+            </button>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <IdentityCard name="Sean (Sponsor)" type="SBT" score={seanScore} color="bg-indigo-600" />
-          <IdentityCard name="MEL Agent" type="DBT" score={melScore} color="bg-emerald-600" />
-          <IdentityCard name="SOPHIA Agent" type="DBT" score={sophiaScore} color="bg-amber-600" />
-        </div>
+        {step === 2 && (
+          <div style={{ padding: '20px', backgroundColor: '#222', borderRadius: '8px' }}>
+            <h2>[2] Email Verification</h2>
+            <p style={{ color: '#aaa', marginBottom: '15px' }}>DBT created: <strong>{dbtTokenId}</strong><br/>Enter the 6-digit OTP sent to your email (check server console).</p>
+            <input 
+              value={emailOtp} 
+              onChange={e => setEmailOtp(e.target.value)} 
+              placeholder="000000" 
+              style={{ padding: '10px', width: '100%', marginBottom: '15px', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '4px' }}
+            />
+            <button 
+              onClick={() => verifyFactor('email', emailOtp)} 
+              disabled={loading || !emailOtp}
+              style={{ padding: '10px 20px', backgroundColor: '#4ADE80', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              {loading ? 'Verifying...' : 'Verify Email'}
+            </button>
+          </div>
+        )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <section className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl">
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <LinkIcon className="w-6 h-6 text-indigo-400" />
-              Operator Actions
-            </h2>
-            <div className="space-y-4">
-              <button 
-                disabled={loading !== null}
-                onClick={() => handleAction('vouch-mel', '/api/vouch', { target: 'mel.agent', type: 'revocable' })}
-                className="w-full bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/50 text-emerald-400 font-bold py-4 px-6 rounded-xl transition-colors flex justify-between items-center group disabled:opacity-50"
-              >
-                <span>Vouch for MEL (Revocable)</span>
-                {loading === 'vouch-mel' ? <span className="animate-pulse">Tx Pending...</span> : <span className="opacity-0 group-hover:opacity-100 transition-opacity">→ +15 Rep</span>}
-              </button>
-              
-              <button 
-                disabled={loading !== null}
-                onClick={() => handleAction('remove-mel', '/api/remove-vouch', { target: 'mel.agent' })}
-                className="w-full bg-slate-800/50 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold py-4 px-6 rounded-xl transition-colors flex justify-between items-center group disabled:opacity-50"
-              >
-                <span>Remove MEL Vouching</span>
-                {loading === 'remove-mel' ? <span className="animate-pulse">Tx Pending...</span> : <span className="hidden group-hover:flex items-center text-red-400"><Unlink className="w-4 h-4 mr-1"/> -15 Rep</span>}
-              </button>
+        {step === 3 && (
+          <div style={{ padding: '20px', backgroundColor: '#222', borderRadius: '8px' }}>
+            <h2>[3] SMS Verification</h2>
+            <p style={{ color: '#aaa', marginBottom: '15px' }}>✅ Factor 1/4 verified — Email confirmed<br/>Enter the 6-digit OTP sent to your phone (check console).</p>
+            <input 
+              value={smsOtp} 
+              onChange={e => setSmsOtp(e.target.value)} 
+              placeholder="000000" 
+              style={{ padding: '10px', width: '100%', marginBottom: '15px', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '4px' }}
+            />
+            <button 
+              onClick={() => verifyFactor('sms', smsOtp)} 
+              disabled={loading || !smsOtp}
+              style={{ padding: '10px 20px', backgroundColor: '#4ADE80', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              {loading ? 'Verifying...' : 'Verify Phone'}
+            </button>
+          </div>
+        )}
 
-              <div className="h-px bg-slate-800 my-6"></div>
+        {step === 4 && (
+          <div style={{ padding: '20px', backgroundColor: '#222', borderRadius: '8px' }}>
+            <h2>[4] Biometric Confirmation</h2>
+            <p style={{ color: '#aaa', marginBottom: '15px' }}>✅ Factor 2/4 verified — Phone confirmed<br/>Confirm biometric liveness check.</p>
+            <button 
+              onClick={() => verifyFactor('biometric', 'biometric_confirmed_' + Date.now())} 
+              disabled={loading}
+              style={{ padding: '10px 20px', backgroundColor: '#4ADE80', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              {loading ? 'Processing...' : 'Simulate Liveness Pass'}
+            </button>
+          </div>
+        )}
 
-              <button 
-                disabled={loading !== null}
-                onClick={() => handleAction('vouch-sophia', '/api/vouch', { target: 'sophia.agent', type: 'time_locked' })}
-                className="w-full bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/50 text-amber-400 font-bold py-4 px-6 rounded-xl transition-colors flex justify-between items-center group disabled:opacity-50"
-              >
-                <span>Vouch for SOPHIA (6-Month Lock)</span>
-                {loading === 'vouch-sophia' ? <span className="animate-pulse">Tx Pending...</span> : <span className="opacity-0 group-hover:opacity-100 transition-opacity">→ +20 Rep</span>}
-              </button>
+        {step === 5 && (
+          <div style={{ padding: '20px', backgroundColor: '#222', borderRadius: '8px' }}>
+            <h2>[5] Wallet Signature</h2>
+            <p style={{ color: '#aaa', marginBottom: '15px' }}>✅ Factor 3/4 verified — Biometric confirmed<br/>Sign challenge to prove custody of {wallet}.</p>
+            <button 
+              onClick={verifyWalletSig} 
+              disabled={loading}
+              style={{ padding: '10px 20px', backgroundColor: '#4ADE80', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              {loading ? 'Waiting for wallet...' : 'Sign with MetaMask'}
+            </button>
+          </div>
+        )}
 
-              <button 
-                disabled={loading !== null}
-                onClick={() => handleAction('remove-sophia', '/api/remove-vouch', { target: 'sophia.agent' })}
-                className="w-full bg-red-900/20 hover:bg-red-900/40 border border-red-500/30 text-red-400 font-bold py-4 px-6 rounded-xl transition-colors flex justify-between items-center group disabled:opacity-50"
-              >
-                <span>Try to Unlink SOPHIA</span>
-                {loading === 'remove-sophia' ? <span className="animate-pulse">Tx Pending...</span> : <span className="opacity-0 group-hover:opacity-100 transition-opacity text-xs border border-red-500/50 px-2 py-1 rounded">Constraint Check Active</span>}
-              </button>
-            </div>
-          </section>
-
-          <section className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl flex flex-col">
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <Activity className="w-6 h-6 text-emerald-400" />
-              Live Trust Events Feed
-            </h2>
-            <div className="flex-1 overflow-y-auto max-h-[500px] space-y-4 pr-2">
-              {events.length === 0 ? (
-                <div className="text-center text-slate-500 py-10 italic">Waiting for consensus events...</div>
-              ) : (
-                events.map((ev) => (
-                  <div key={ev.id} className="bg-slate-950 border border-slate-800 p-4 rounded-lg text-sm font-mono animate-in fade-in slide-in-from-left-4">
-                    <div className="flex justify-between text-slate-500 mb-2 text-xs">
-                      <span>{new Date(ev.created_at).toLocaleTimeString()}</span>
-                      <span className="text-indigo-400/70 truncate w-32 tracking-wider">{ev.tx_hash?.substring(0, 16)}...</span>
-                    </div>
-                    <div className="text-white font-bold flex items-center gap-2">
-                      <span className={ev.event_type.includes('BLOCKED') ? 'text-red-400' : 'text-emerald-400'}>[{ev.event_type}]</span>
-                      {ev.target_address}
-                    </div>
-                    {ev.details && Object.keys(ev.details).length > 0 && (
-                      <div className="mt-2 text-slate-400 text-xs mt-3 bg-slate-900 p-2 rounded">
-                        {JSON.stringify(ev.details)}
-                      </div>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          </section>
-        </div>
+        {step === 6 && sbtResult && (
+          <div style={{ padding: '30px', backgroundColor: '#132c1b', border: '1px solid #4ADE80', borderRadius: '8px' }}>
+            <h2 style={{ color: '#4ADE80', marginBottom: '10px' }}>CONVERSION COMPLETE</h2>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, lineHeight: '2' }}>
+              <li>🏆 <strong>SBT Minted:</strong> {sbtResult.sbt_token_id}</li>
+              <li>📍 <strong>On-chain:</strong> <a href={`https://sepolia.basescan.org/tx/${sbtResult.on_chain_tx_hash}`} target="_blank" style={{color: '#60A5FA'}}>Base Sepolia Explorer</a></li>
+              <li>🛡️ <strong>Qualification Tier:</strong> Retail (verified)</li>
+              <li>📋 <strong>Compliance Receipt:</strong> {sbtResult.receipt_id || 'Generating...'}</li>
+            </ul>
+          </div>
+        )}
       </div>
+
+      {/* RIGHT COLUMN: EVENTS */}
+      <div style={{ width: '400px', backgroundColor: '#1a1a1a', padding: '40px', overflowY: 'auto' }}>
+        <h2 style={{ fontSize: '18px', marginBottom: '20px', borderBottom: '1px solid #333', paddingBottom: '10px' }}>Live Trust Events</h2>
+        {events.map((ev) => (
+          <div key={ev.id} style={{ padding: '15px', backgroundColor: '#222', marginBottom: '10px', borderRadius: '6px', fontSize: '13px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ fontWeight: 'bold', color: '#60A5FA' }}>{ev.event_type}</span>
+              <span style={{ color: '#666' }}>{new Date(ev.created_at).toLocaleTimeString()}</span>
+            </div>
+            <div style={{ color: '#aaa', wordBreak: 'break-all' }}>Subject: {ev.subject_id}</div>
+            <pre style={{ margin: '8px 0 0 0', padding: '8px', backgroundColor: '#111', color: '#888', borderRadius: '4px', fontSize: '11px', overflowX: 'hidden' }}>
+              {JSON.stringify(ev.event_data, null, 2)}
+            </pre>
+          </div>
+        ))}
+      </div>
+
     </div>
   );
 }
