@@ -37,6 +37,9 @@ export default function Home() {
           <span style={{ fontSize: '20px', fontWeight: 'bold' }}>TrustRails</span>
         </div>
         <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+          <Link href="/cre-license" style={{ color: '#10b981', textDecoration: 'none', fontSize: '15px', fontWeight: 'bold' }}>
+            CRE License
+          </Link>
           <Link href="/dashboard" style={{ color: '#f1f5f9', textDecoration: 'none', fontSize: '15px' }}>
             Enter Dashboard
           </Link>
