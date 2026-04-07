@@ -610,7 +610,7 @@ export default function Dashboard() {
                         <div><span style={{color: '#94a3b8', display: 'inline-block', width: '100px'}}>BFT:</span> 91% — PASSES threshold ✓</div>
                       </div>
                       <div style={{ fontSize: '14px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
-                        $75,000 > single-sig limit: $50,000<br/>
+                        $75,000 &gt; single-sig limit: $50,000<br/>
                         Dual-sig required. Transaction locked.<br/><br/>
                         Co-authorization pending:<br/>
                         CFO — SBT-CFO-001 [Biometric] ⏳ Pending<br/>
