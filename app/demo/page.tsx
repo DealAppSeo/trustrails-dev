@@ -83,7 +83,7 @@ export default function DemoPage() {
       const message = `TrustRails PoL verification | ${dbtTokenId} | ${timestamp}`;
       const signature = await signer.signMessage(message);
       
-      await verifyFactor('wallet_sig', { signature, message });
+      await verifyFactor('wallet_sig', JSON.stringify({ signature, message }));
     } catch (err: any) {
       alert(err.message);
       setLoading(false);

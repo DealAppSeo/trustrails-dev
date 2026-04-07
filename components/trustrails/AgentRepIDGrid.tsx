@@ -137,9 +137,8 @@ export function AgentRepIDGrid() {
                     top: '-3px',
                     width: '3px',
                     height: '12px',
-                    background: '#f59e0b',
-                    title: 'Autonomous threshold: 9,000'
-                  }} />
+                    background: '#f59e0b'
+                  }} title="Autonomous threshold: 9,000" />
                 </div>
                 {/* Label only for agents near threshold */}
                 {agent.repid_score >= 8500 && (
