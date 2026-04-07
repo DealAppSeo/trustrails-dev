@@ -1,6 +1,73 @@
 import Link from 'next/link';
+import { headers } from 'next/headers';
+import { WaitlistForm } from './WaitlistForm';
 
 export default function Home() {
+  const headersList = headers();
+  const host = headersList.get('host') || '';
+
+  if (host.includes('trusttrader')) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#0a0f1e] text-center font-sans px-4 py-16">
+        <h1 className="text-[72px] font-bold text-white leading-tight">TrustTrader</h1>
+        <p className="text-[20px] text-[#94a3b8] font-mono uppercase tracking-wide mt-2">Constitutional AI Trading System</p>
+        
+        <div className="h-px bg-[#1e293b] w-full max-w-[400px] mx-auto my-12"></div>
+
+        <div className="flex flex-col md:flex-row justify-center gap-10 md:gap-16 mb-16">
+          <div className="flex flex-col items-center">
+            <span className="text-[36px] text-[#22c55e] font-mono">0%</span>
+            <span className="text-[11px] text-[#475569] uppercase font-mono mt-2">MAX DRAWDOWN</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <span className="text-[36px] text-[#22c55e] font-mono">49.63%</span>
+            <span className="text-[11px] text-[#475569] uppercase font-mono mt-2">WITHOUT VETO</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <span className="text-[36px] text-[#22c55e] font-mono">531441/524288</span>
+            <span className="text-[11px] text-[#475569] uppercase font-mono mt-2">PYTHAGOREAN COMMA</span>
+          </div>
+        </div>
+
+        <div className="bg-[#1c1407] border border-[#78350f] rounded p-6 w-full max-w-[480px] mx-auto mb-16 shadow-lg shadow-amber-900/10">
+          <h2 className="text-[24px] font-bold text-[#f59e0b] mb-4">BEAT OUR AGENT</h2>
+          <p className="text-[14px] text-[#94a3b8] mb-4">
+            SOPHIA has issued 4 constitutional refusals.<br/>
+            Drawdown: 0%. Can you beat her?
+          </p>
+          <p className="text-[14px] text-[#f8fafc] mb-6 font-semibold">
+            Beat SOPHIA's 30-day P&L → Win Full tier<br/>
+            for life ($499/mo value)
+          </p>
+          <Link href="/trade" className="inline-block bg-[#f59e0b] text-[#0a0f1e] px-8 py-3 rounded font-bold text-[16px] hover:bg-[#d97706] transition-colors">
+            Enter the Challenge →
+          </Link>
+        </div>
+
+        <div className="mb-16">
+          <p className="text-[14px] text-[#94a3b8] text-center mb-4">Join the waitlist for early access</p>
+          <WaitlistForm />
+        </div>
+
+        <div className="text-[12px] text-[#475569] font-mono text-center mb-16 leading-relaxed">
+          🏆 Submitted to LabLab AI Trading Agents<br/>
+          Hackathon — April 2026 — $55K Prize Pool
+        </div>
+
+        <div className="mb-4 flex flex-col items-center">
+          <Link href="/trade" className="inline-block border border-[#1d4ed8] text-[#93c5fd] px-6 py-2.5 rounded hover:bg-[#1d4ed8]/20 transition-colors">
+            Launch Terminal →
+          </Link>
+          <div className="text-[#334155] text-[12px] mt-3 tracking-widest">trusttrader.dev/trade</div>
+        </div>
+
+        <footer className="text-[11px] text-[#334155] mt-auto pb-4">
+          Powered by RepID · HyperDAG Protocol · ERC-8004 on Base Sepolia
+        </footer>
+      </div>
+    );
+  }
+
   return (
     <div style={{
       background: '#020817',
