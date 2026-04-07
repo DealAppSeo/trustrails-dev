@@ -24,26 +24,24 @@ const SIGNALS = [
   { pos: 9, note: 'D#', name: 'Inflation' },
   { pos: 10, note: 'A#', name: 'Guru Consensus' },
   { pos: 11, note: 'F', name: 'ETF Flow' },
-  { pos: 12, note: 'C', name: 'Congressional Trading (Judas)', isAntagonist: true }
+  { pos: 12, note: 'C', name: 'Congressional Trading', isAntagonist: true }
 ];
 
 export default function TradePage() {
   const [profile, setProfile] = useState(RISK_PROFILES[2]);
-  const [repId, setRepId] = useState<number>(8500); // Earned/10000 = Logic
+  const [repId, setRepId] = useState<number>(8500); 
   const [perceivedRepId, setPerceivedRepId] = useState<number>(8500);
   
-  const chaos = 0.820; // ANFIS confidence stub
-  const dissonance = 0.0124; // dissonance stub
+  const chaos = 0.820; 
+  const dissonance = 0.0124; 
   const beauty = 1 - dissonance;
   
   const logic = repId / 10000;
   
-  // (Logic × Chaos × Beauty)^(1/φ)
   const phi = 1.61803398875;
   const unityScore = Math.pow(logic * chaos * beauty, 1 / phi);
 
   useEffect(() => {
-    // Fetch live RepID for SOPHIA
     const fetchRepId = async () => {
       const { data, error } = await supabase
         .from('agent_repid')
@@ -59,7 +57,6 @@ export default function TradePage() {
     };
     fetchRepId();
     
-    // Subscribe to changes
     const channel = supabase.channel('agent_repid_updates')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'agent_repid', filter: "agent_name=eq.'SOPHIA'" }, payload => {
         setRepId(payload.new.earned_repid);
@@ -72,178 +69,181 @@ export default function TradePage() {
     };
   }, []);
 
-  // Generate stub values for the 13 signals
   const [signalValues] = useState(() => 
-    SIGNALS.map(s => ({
-      ...s,
-      value: s.isAntagonist ? -0.8 : (Math.random() * 2 - 0.5) // Random values between -0.5 and 1.5, antagonist negative
-    }))
+    SIGNALS.map(s => {
+      let val = s.isAntagonist ? -0.8 : (Math.random() * 2 - 0.5);
+      return { ...s, value: val };
+    })
   );
 
+  const getUnityColor = (score: number) => {
+    if (score > 0.95) return 'border-[#22c55e] text-[#22c55e]';
+    if (score >= 0.7) return 'border-[#f59e0b] text-[#f59e0b]';
+    return 'border-[#ef4444] text-[#ef4444]';
+  };
+
   return (
-    <div className="min-h-screen bg-[#0a0f1e] text-slate-100 font-sans p-8">
-      <header className="max-w-4xl mx-auto mb-12">
-        <h1 className="text-4xl font-bold text-white mb-2">TrustTrader</h1>
-        <p className="text-slate-400">Institutional AI Agent Finance</p>
+    <div className="min-h-screen bg-[#0a0f1e] text-[#f8fafc] font-sans p-8">
+      <header className="max-w-5xl mx-auto mb-10 pb-4 border-b border-[#1e293b]">
+        <h1 className="text-3xl font-bold mb-1">TrustTrader</h1>
+        <p className="text-[#94a3b8] text-sm">Institutional AI Agent Finance Terminal</p>
       </header>
 
-      <div className="max-w-4xl mx-auto space-y-12">
+      <div className="max-w-5xl mx-auto space-y-8">
+        
         {/* Risk Profile Selector */}
-        <section className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <h2 className="text-xl font-semibold mb-4 text-slate-200">Risk Profile</h2>
-          <div className="flex flex-wrap gap-2 mb-4">
+        <section className="bg-[#1e293b] rounded p-6">
+          <h2 className="text-sm uppercase tracking-wider font-semibold mb-4 text-[#f8fafc]">Constitutional Risk Threshold</h2>
+          <div className="flex flex-wrap gap-3">
             {RISK_PROFILES.map(p => (
               <button
                 key={p.id}
                 onClick={() => setProfile(p)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-colors border ${
                   profile.id === p.id 
-                    ? 'bg-blue-600 text-white border-blue-500' 
-                    : 'bg-transparent text-slate-400 border-slate-700 hover:border-slate-500'
-                } border`}
+                    ? 'bg-[#3b82f6] text-[#f8fafc] border-[#3b82f6]' 
+                    : 'bg-transparent text-[#94a3b8] border-[#334155] hover:border-[#94a3b8]'
+                }`}
               >
                 {p.label}
               </button>
             ))}
           </div>
-          <div className="text-slate-400 font-mono text-sm space-y-1">
-            <p>Effective Comma Threshold: <span className="text-blue-400">{profile.threshold}</span> {profile.note}</p>
+          <div className="text-[#94a3b8] font-mono text-xs mt-4">
+            Threshold: <span className="text-[#f8fafc]">{profile.threshold}</span> {profile.note}
           </div>
         </section>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Circle of Fifths */}
-          <section className="bg-slate-900 border border-slate-800 rounded-xl p-8 flex flex-col items-center">
-            <h2 className="text-xl font-semibold mb-8 text-slate-200">Harmonic Resonance</h2>
+          
+          {/* Signal Harmonic Map */}
+          <section className="bg-[#1e293b] rounded p-6 flex flex-col items-center">
+            <h2 className="text-sm uppercase tracking-wider font-semibold mb-6 text-[#f8fafc] self-start w-full border-b border-[#334155] pb-2">Signal Harmonic Map</h2>
             
-            <div className="relative w-64 h-64 mb-8">
+            <div className="relative w-64 h-64 mb-4">
               <svg viewBox="0 0 200 200" className="w-full h-full overflow-visible">
                 {/* Background circle */}
-                <circle cx="100" cy="100" r="80" fill="none" stroke="#1e293b" strokeWidth="4" />
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#334155" strokeWidth="1" />
                 
                 {signalValues.map((signal, i) => {
                   if (signal.isAntagonist) {
-                    // Position 12 (Judas) - slightly outside top (Position 0)
-                    const angle = -Math.PI / 2; // Top
-                    const r = 95; // Outside main circle
+                    const angle = -Math.PI / 2;
+                    const r = 92;
                     const x = 100 + r * Math.cos(angle);
                     const y = 100 + r * Math.sin(angle);
                     return (
                       <g key={i}>
-                        <circle cx={x} cy={y} r="6" fill="#ef4444" className="animate-pulse" />
-                        <text x={x + 12} y={y + 4} fill="#ef4444" fontSize="8" fontFamily="monospace">Judas</text>
+                        <circle cx={x} cy={y} r="3" fill="#ef4444" className="animate-pulse" />
+                        <title>⚠ Comma Antagonist</title>
                       </g>
                     );
                   }
 
-                  // 12 positions
                   const angle = (signal.pos * 30 - 90) * (Math.PI / 180);
                   const r = 80;
                   const x = 100 + r * Math.cos(angle);
                   const y = 100 + r * Math.sin(angle);
                   
-                  const isBullish = signal.value > 0;
-                  const color = isBullish ? '#34d399' : '#ef4444';
+                  let color = '#f59e0b'; // Amber neutral
+                  if (signal.value > 0.1) color = '#22c55e'; // Green harmony
+                  else if (signal.value < -0.1) color = '#ef4444'; // Red dissonance
 
                   return (
                     <g key={i}>
-                      {/* Note Label */}
                       <text 
                         x={100 + (r+15) * Math.cos(angle)} 
                         y={100 + (r+15) * Math.sin(angle)} 
-                        fill="#64748b" 
-                        fontSize="10" 
+                        fill="#94a3b8" 
+                        fontSize="5" 
+                        fontFamily="monospace"
                         textAnchor="middle" 
                         dominantBaseline="middle"
                       >
                         {signal.note}
                       </text>
-                      {/* Signal Dot */}
-                      <circle 
-                        cx={x} 
-                        cy={y} 
-                        r="6" 
-                        fill={color} 
-                        className="transition-all duration-500" 
-                      />
-                      {/* Name tooltip fallback via title */}
-                      <title>{signal.name}: {signal.value.toFixed(2)}</title>
+                      <circle cx={x} cy={y} r="3" fill={color} className="transition-all duration-500" />
+                      <title>{signal.name}: {signal.value.toFixed(3)}</title>
                     </g>
                   );
                 })}
 
-                {/* Center text */}
-                <text x="100" y="95" fill="#94a3b8" fontSize="10" textAnchor="middle">Dissonance</text>
-                <text x="100" y="115" fill="#f8fafc" fontSize="16" fontWeight="bold" fontFamily="monospace" textAnchor="middle">{dissonance.toFixed(4)}</text>
+                <text x="100" y="95" fill="#94a3b8" fontSize="6" fontFamily="monospace" textAnchor="middle">Dissonance:</text>
+                <text x="100" y="105" fill="#f8fafc" fontSize="8" fontFamily="monospace" textAnchor="middle">{dissonance.toFixed(4)}</text>
               </svg>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-sm text-slate-400 uppercase tracking-wider font-semibold mb-2">Unity Score</div>
-              <div className={`text-5xl font-mono font-bold ${unityScore > 0.95 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                {unityScore.toFixed(3)}
-              </div>
             </div>
           </section>
 
-          {/* Stats & PoR Feed */}
-          <div className="space-y-8">
-            <section className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-              <h2 className="text-xl font-semibold mb-4 text-slate-200">Harmonic Components</h2>
-              
-              <div className="space-y-4 mb-6 font-mono">
-                <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                  <span className="text-slate-400">Logic (RepID / 10000)</span>
-                  <span className="text-white text-lg">{logic.toFixed(3)}</span>
-                </div>
-                <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                  <span className="text-slate-400">Chaos (ANFIS Conf.)</span>
-                  <span className="text-white text-lg">{chaos.toFixed(3)}</span>
-                </div>
-                <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                  <span className="text-slate-400">Beauty (1 - Dissonance)</span>
-                  <span className="text-white text-lg">{beauty.toFixed(3)}</span>
-                </div>
-              </div>
+          {/* Unity Score Gauge / Terminal */}
+          <section className="bg-[#1e293b] rounded p-6 flex flex-col items-center">
+            <h2 className="text-sm uppercase tracking-wider font-semibold mb-6 text-[#f8fafc] self-start w-full border-b border-[#334155] pb-2">Unity Score</h2>
 
-              <div className="p-4 bg-black/40 rounded-lg">
-                <div className="text-xs text-slate-500 mb-1 uppercase font-bold">Formula</div>
-                <div className="text-blue-400 font-mono text-sm">(Logic × Chaos × Beauty)^(1/φ)</div>
+            <div className={`mt-2 mb-8 px-12 py-8 bg-[#0a0f1e] rounded-md border text-center ${getUnityColor(unityScore)}`}>
+              <div className="text-6xl font-mono tracking-tight font-bold">
+                {unityScore.toFixed(3)}
               </div>
-            </section>
+            </div>
 
-            <section className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-slate-200">Agent Performance</h2>
-                <span className="px-3 py-1 bg-blue-900/50 text-blue-400 border border-blue-800 rounded-full text-xs font-bold uppercase tracking-wider">Sophia</span>
+            <div className="grid grid-cols-3 gap-6 w-full text-center border-t border-b border-[#334155] py-4 mb-4">
+              <div className="flex flex-col">
+                <span className="text-[10px] text-[#94a3b8] font-monospace uppercase mb-1">Logic</span>
+                <span className="text-sm font-mono text-[#f8fafc]">{logic.toFixed(3)}</span>
               </div>
-              
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="p-4 bg-slate-950 rounded-lg border border-slate-800">
-                  <div className="text-sm text-slate-400 mb-1">Earned RepID</div>
-                  <div className="text-2xl font-mono text-white">{repId}</div>
-                </div>
-                <div className="p-4 bg-slate-950 rounded-lg border border-slate-800">
-                  <div className="text-sm text-slate-400 mb-1">Perceived RepID</div>
-                  <div className="text-2xl font-mono text-indigo-400">{perceivedRepId}</div>
-                </div>
+              <div className="flex flex-col border-x border-[#334155]">
+                <span className="text-[10px] text-[#94a3b8] font-monospace uppercase mb-1">Chaos</span>
+                <span className="text-sm font-mono text-[#f8fafc]">{chaos.toFixed(3)}</span>
               </div>
-
-              <h3 className="text-sm font-semibold text-slate-400 mb-3 uppercase">Proof of Refusal</h3>
-              <div className="space-y-2">
-                {[1,2,3].map(i => (
-                  <div key={i} className="p-3 bg-slate-950/50 border border-slate-800 rounded-lg flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-rose-500"></div>
-                      <span className="font-mono text-sm text-slate-300">TX-Refuse-{Math.random().toString(36).substring(2, 8).toUpperCase()}</span>
-                    </div>
-                    <span className="text-xs text-slate-500">{i * 2}m ago</span>
-                  </div>
-                ))}
+              <div className="flex flex-col">
+                <span className="text-[10px] text-[#94a3b8] font-monospace uppercase mb-1">Beauty</span>
+                <span className="text-sm font-mono text-[#f8fafc]">{beauty.toFixed(3)}</span>
               </div>
-            </section>
-          </div>
+            </div>
+            
+            <div className="text-[10px] font-mono text-[#94a3b8] tracking-widest mt-2">
+              (L × C × B)^(1/φ) | φ = 1.618
+            </div>
+          </section>
         </div>
+
+        {/* Proof of Refusal Feed order book */}
+        <section className="bg-[#1e293b] rounded p-6">
+          <h2 className="text-sm uppercase tracking-wider font-semibold mb-4 text-[#f8fafc] border-b border-[#334155] pb-2">Constitutional Decisions</h2>
+          
+          <div className="font-mono text-xs overflow-x-auto">
+            <div className="flex text-[#94a3b8] pb-2 mb-2 border-b border-[#334155]">
+              <div className="w-24">TIME</div>
+              <div className="w-28">STATUS</div>
+              <div className="w-24 text-right">SCORE</div>
+              <div className="flex-1 pl-6">REASON / TX ID</div>
+            </div>
+            
+            <div className="space-y-1">
+              {[
+                { id: '8F2B1A9C', time: '14:22:04', status: 'EXECUTE', score: 0.982, action: 'Yield alloc approved' },
+                { id: '3D7E4C21', time: '14:18:33', status: 'REFUSED', score: 0.612, action: 'Comma threshold violation' },
+                { id: '9A5F8B03', time: '14:15:10', status: 'EXECUTE', score: 0.974, action: 'Rebalance executed' },
+                { id: '2C4E6A19', time: '14:10:02', status: 'REFUSED', score: 0.441, action: 'Unverified counterpart' }
+              ].map((row, i) => (
+                <div key={i} className="flex items-center py-2 text-[#f8fafc] hover:bg-[#334155]/30 cursor-default transition-colors">
+                  <div className="w-24 text-[#94a3b8]">{row.time}</div>
+                  <div className="w-28">
+                    {row.status === 'EXECUTE' ? (
+                      <span className="px-2 py-1 rounded bg-[#22c55e]/20 text-[#22c55e]">EXECUTE</span>
+                    ) : (
+                      <span className="px-2 py-1 rounded bg-[#ef4444]/20 text-[#ef4444]">REFUSED</span>
+                    )}
+                  </div>
+                  <div className={`w-24 text-right ${row.status === 'EXECUTE' ? 'text-[#22c55e]' : 'text-[#ef4444]'}`}>
+                    {row.score.toFixed(3)}
+                  </div>
+                  <div className="flex-1 pl-6 truncate text-[#94a3b8]">
+                    {row.action} [{row.id}]
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
       </div>
     </div>
   );
