@@ -113,6 +113,17 @@ export default function Home() {
           <Link href="/dashboard" style={{ color: '#f1f5f9', textDecoration: 'none', fontSize: '15px' }}>
             Enter Dashboard
           </Link>
+          <a href="https://trusttrader.dev/trade" style={{
+            background: '#f59e0b',
+            color: '#0a0f1e',
+            fontWeight: 'bold',
+            fontSize: '15px',
+            padding: '8px 16px',
+            borderRadius: '6px',
+            textDecoration: 'none'
+          }}>
+            Enter Terminal →
+          </a>
           <a href="https://github.com/DealAppSeo/trustrails-dev" target="_blank" rel="noreferrer" style={{
             fontSize: '15px',
             padding: '8px 16px',

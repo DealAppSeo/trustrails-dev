@@ -4,132 +4,158 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
+type Signal = {
+  id: string;
+  category: string;
+  display_name: string;
+  description: string;
+  circle_position?: string;
+};
+
 export default function SignalsPage() {
-  const [signals, setSignals] = useState<any[]>([]);
-  const [filter, setFilter] = useState('All');
+  const [signals, setSignals] = useState<Signal[]>([]);
+  const [liveSignals, setLiveSignals] = useState<Set<string>>(new Set());
+  const [toggles, setToggles] = useState<Record<string, boolean>>({});
+  const [expandedCats, setExpandedCats] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
+    // Load toggles
+    const saved = localStorage.getItem('trusttrader_signals_toggles');
+    if (saved) {
+      try {
+        setToggles(JSON.parse(saved));
+      } catch (e) {}
+    }
+
     async function load() {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('signal_library')
         .select('*')
-        .order('is_core', { ascending: false })
         .order('category')
         .order('display_name');
       
       if (data) setSignals(data);
+
+      try {
+        const { data: liveData } = await supabase.from('trusttrader_signals').select('signal_id');
+        if (liveData) {
+          setLiveSignals(new Set(liveData.map(d => d.signal_id)));
+        }
+      } catch(e) {}
     }
     load();
   }, []);
 
-  const categories = ['All', 'Sentiment', 'On-Chain', 'Macro', 'Technical'];
-  const filtered = filter === 'All' ? signals : signals.filter(s => s.category === filter);
+  const handleToggle = (id: string) => {
+    const next = { ...toggles, [id]: !toggles[id] };
+    setToggles(next);
+    localStorage.setItem('trusttrader_signals_toggles', JSON.stringify(next));
+  };
+
+  const toggleCat = (cat: string) => {
+    setExpandedCats(prev => ({ ...prev, [cat]: prev[cat] === false ? true : false }));
+  };
+
+  const categories = Array.from(new Set(signals.map(s => s.category)));
+  const grouped = categories.reduce((acc, cat) => {
+    acc[cat] = signals.filter(s => s.category === cat);
+    return acc;
+  }, {} as Record<string, Signal[]>);
 
   const catColor = (cat: string) => {
     switch (cat) {
-      case 'Sentiment': return 'bg-[#3b82f6]/20 text-[#3b82f6]';
-      case 'On-Chain': return 'bg-[#22c55e]/20 text-[#22c55e]';
-      case 'Macro': return 'bg-[#f59e0b]/20 text-[#f59e0b]';
-      case 'Technical': return 'bg-[#8b5cf6]/20 text-[#8b5cf6]';
-      default: return 'bg-slate-800 text-slate-300';
+      case 'Sentiment': return 'bg-[#3b82f6]/20 text-[#3b82f6] border-[#3b82f6]/30';
+      case 'On-Chain': return 'bg-[#22c55e]/20 text-[#22c55e] border-[#22c55e]/30';
+      case 'Macro': return 'bg-[#f59e0b]/20 text-[#f59e0b] border-[#f59e0b]/30';
+      case 'Technical': return 'bg-[#8b5cf6]/20 text-[#8b5cf6] border-[#8b5cf6]/30';
+      default: return 'bg-slate-800 text-slate-300 border-slate-700';
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e] text-[#f8fafc] font-sans p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        
-        <div className="mb-4">
-          <Link href="/trade" className="text-[#94a3b8] hover:text-white transition-colors text-[13px] tracking-wide uppercase font-semibold">
-            ← Back to Terminal
-          </Link>
+    <div className="flex flex-col min-h-screen bg-[#0a0f1e] text-[#f8fafc] font-sans">
+      {/* Top bar matching terminal */}
+      <header className="flex items-center px-4 shrink-0" style={{ height: 41, background: "#0d1424", borderBottom: "1px solid #1e293b" }}>
+        <Link href="/trade" className="text-[#94a3b8] hover:text-white font-mono text-xs tracking-widest uppercase transition-colors">
+          ← Return to Terminal
+        </Link>
+      </header>
+
+      <main className="flex-1 max-w-4xl w-full mx-auto p-8 overflow-y-auto">
+        <div className="mb-10 border-b border-[#1e293b] pb-6">
+          <h1 className="text-3xl font-bold font-mono tracking-tight mb-2">Signal Library — 37 Constitutional Trading Signals</h1>
+          <p className="text-[#94a3b8] font-mono text-sm tracking-wide">Select 3-12 signals for your agent to monitor.</p>
         </div>
 
-        <header>
-          <h1 className="text-[32px] font-bold text-white leading-tight">Signal Library</h1>
-          <p className="text-[14px] text-[#94a3b8] mt-1">{signals.length || 37} signals available. Select yours.</p>
-        </header>
+        <div className="space-y-6">
+          {categories.map(cat => {
+            const isExpanded = expandedCats[cat] !== false; // Default true
+            const catSignals = grouped[cat];
 
-        {/* Tier banner */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-[#1e293b] rounded-lg p-4 flex flex-col justify-center">
-            <div className="font-bold text-white text-sm">Free</div>
-            <div className="text-sm text-[#94a3b8]">View only</div>
-          </div>
-          <div className="bg-[#1e293b] rounded-lg p-4 flex flex-col justify-center">
-            <div className="font-bold text-white text-sm">Pro <span className="text-[#22c55e] ml-1">$399</span></div>
-            <div className="text-sm text-[#94a3b8]">Adjust weights</div>
-          </div>
-          <div className="bg-[#1e293b] rounded-lg p-4 flex flex-col justify-center">
-            <div className="font-bold text-white text-sm">Custom <span className="text-[#22c55e] ml-1">$749</span></div>
-            <div className="text-sm text-[#94a3b8]">Add 5 custom signals</div>
-          </div>
-          <div className="bg-[#1e293b] rounded-lg p-4 flex flex-col justify-center">
-            <div className="font-bold text-white text-sm">Any tier <span className="text-[#3b82f6] ml-1">-$250</span></div>
-            <div className="text-sm text-[#94a3b8]">Enable federated learning</div>
-          </div>
-        </div>
+            return (
+              <div key={cat} className="border border-[#1e293b] bg-[#0d1424] rounded overflow-hidden">
+                <button 
+                  onClick={() => toggleCat(cat)}
+                  className="w-full flex items-center justify-between p-4 bg-[#111827] hover:bg-[#1f2937] transition-colors border-b border-[#1e293b]"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono font-bold uppercase tracking-widest text-sm text-[#e2e8f0]">{cat}</span>
+                    <span className="font-mono text-xs text-[#475569]">{catSignals.length} signals</span>
+                  </div>
+                  <span className="text-[#64748b]">{isExpanded ? '▼' : '►'}</span>
+                </button>
 
-        {/* Filters */}
-        <div className="flex gap-2 border-b border-[#1e293b] pb-4">
-          {categories.map(c => (
-            <button
-              key={c}
-              onClick={() => setFilter(c)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                filter === c ? 'bg-[#1e293b] text-white border border-[#334155]' : 'text-[#94a3b8] hover:text-white border border-transparent hover:border-[#334155]'
-              }`}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {filtered.map(s => (
-            <div key={s.id} className="bg-[#0d1424] border border-[#1e293b] rounded-[4px] p-4 flex flex-col h-full">
-              <div className="flex justify-between items-start mb-3">
-                <h3 className="font-bold text-white text-sm">{s.display_name}</h3>
-                {s.is_core && (
-                  <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 text-[10px] font-black tracking-wider border border-amber-500/20">
-                    CORE
-                  </span>
+                {isExpanded && (
+                  <div className="divide-y divide-[#1e293b]">
+                    {catSignals.map(s => (
+                      <div key={s.id} className="p-4 flex flex-col md:flex-row md:items-center gap-4 bg-[#0a0f1e] hover:bg-[#0f172a] transition-colors">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-1">
+                            <h3 className="font-bold text-white text-sm">{s.display_name}</h3>
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${catColor(s.category)}`}>
+                              {s.category}
+                            </span>
+                            {liveSignals.has(s.id) && (
+                              <span className="px-2 py-0.5 rounded bg-green-500/10 text-green-500 text-[10px] font-mono border border-green-500/20">
+                                LIVE
+                              </span>
+                            )}
+                            {s.circle_position && (
+                              <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 text-[10px] font-mono border border-amber-500/20">
+                                Pos: {s.circle_position}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[#94a3b8] text-xs leading-relaxed max-w-2xl">
+                            {s.description}
+                          </p>
+                        </div>
+                        
+                        <div className="shrink-0 flex items-center">
+                          <button
+                            onClick={() => handleToggle(s.id)}
+                            className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
+                            style={{ background: toggles[s.id] ? '#10b981' : '#334155' }}
+                          >
+                            <span 
+                              className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+                              style={{ transform: toggles[s.id] ? 'translateX(24px)' : 'translateX(4px)' }}
+                            />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
-              <div className="mb-3">
-                <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${catColor(s.category)}`}>
-                  {s.category}
-                </span>
-              </div>
-              <p className="text-[#94a3b8] text-[12px] flex-1 mb-6 leading-relaxed">
-                {s.description}
-              </p>
-              <div className="flex justify-between items-center pt-3 border-t border-[#1e293b] mt-auto">
-                <span className="text-[#475569] text-[10px] uppercase font-semibold">{s.data_source}</span>
-                <span className="font-mono text-[#475569] text-[12px]">
-                  w=<span className="text-[#f8fafc]">{Number(s.default_weight).toFixed(2)}</span>
-                </span>
-              </div>
-            </div>
-          ))}
-          {/* Fallback stubs if no real data retrieved */}
-          {signals.length === 0 && Array.from({length: 6}).map((_, i) => (
-             <div key={i} className="bg-[#0d1424] border border-[#1e293b] rounded-[4px] p-4 flex flex-col h-full opacity-50 animate-pulse">
-               <div className="flex justify-between items-center mb-4">
-                 <div className="w-32 h-4 bg-[#1e293b] rounded"></div>
-                 <div className="w-10 h-4 bg-[#1e293b] rounded"></div>
-               </div>
-               <div className="w-16 h-4 bg-[#1e293b] rounded mb-5"></div>
-               <div className="w-full h-16 bg-[#1e293b] rounded mb-6"></div>
-               <div className="flex justify-between mt-auto pt-3 border-t border-[#1e293b]">
-                 <div className="w-20 h-3 bg-[#1e293b] rounded"></div>
-                 <div className="w-10 h-3 bg-[#1e293b] rounded"></div>
-               </div>
-             </div>
-          ))}
+            );
+          })}
+          
+          {signals.length === 0 && (
+            <div className="text-[#475569] font-mono text-center py-10 animate-pulse">Loading core Constitutional signals...</div>
+          )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
