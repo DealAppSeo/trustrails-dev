@@ -107,9 +107,6 @@ export default function Home() {
           <Link href="/cre-license" style={{ color: '#10b981', textDecoration: 'none', fontSize: '15px', fontWeight: 'bold' }}>
             CRE License
           </Link>
-          <Link href="/suite" style={{ color: '#f1f5f9', textDecoration: 'none', fontSize: '15px', fontWeight: 'bold' }}>
-            Trust Suite
-          </Link>
           <Link href="/dashboard" style={{ color: '#f1f5f9', textDecoration: 'none', fontSize: '15px' }}>
             Enter Dashboard
           </Link>
