@@ -1,236 +1,193 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
+import { createClient } from '@supabase/supabase-js';
 
-export default function DemoPage() {
-  const [wallet, setWallet] = useState('');
-  const [dbtTokenId, setDbtTokenId] = useState('');
-  const [emailOtp, setEmailOtp] = useState('');
-  const [smsOtp, setSmsOtp] = useState('');
-  const [events, setEvents] = useState<any[]>([]);
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [factorsVerified, setFactorsVerified] = useState(0);
-  const [sbtResult, setSbtResult] = useState<any>(null);
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://qnnpjhlxljtqyigedwkb.supabase.co',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+);
 
-  // Poll trust_events every 3s
+export default function ProtocolDemo() {
+  const [totalDecisions, setTotalDecisions] = useState(0);
+  const [refusedCount, setRefusedCount] = useState(0);
+  const [feed, setFeed] = useState<any[]>([]);
+  const [signals, setSignals] = useState({ fg: '--', btc: '--', rsi: '--' });
+  const [repIdScore, setRepIdScore] = useState(9995);
+
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle'|'loading'|'success'|'error'>('idle');
+
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const res = await fetch('/api/trustrails/trust-events?limit=20');
-        if (res.ok) {
-          const data = await res.json();
-          setEvents(data.events);
-        }
-      } catch (err) {}
+    // Initial fetch
+    const fetchStats = async () => {
+      // Get all decisions
+      const { data: decisions } = await supabase
+        .from('trade_execution_log')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (decisions) {
+        setTotalDecisions(decisions.length);
+        setRefusedCount(decisions.filter((d: any) => d.decision === 'REFUSED').length);
+        setFeed(decisions.slice(0, 8));
+      }
+
+      // Get signals
+      const { data: sigData } = await supabase
+        .from('trusttrader_signals')
+        .select('*');
+
+      if (sigData) {
+        const fg = sigData.find(s => s.name.includes('Fear'))?.value || '72';
+        const btc = sigData.find(s => s.name.includes('BTC') || s.name.includes('Price'))?.value || '64,250';
+        const rsi = sigData.find(s => s.name.includes('RSI'))?.value || '68';
+        setSignals({ fg, btc, rsi });
+      }
     };
-    fetchEvents();
-    const interval = setInterval(fetchEvents, 3000);
-    return () => clearInterval(interval);
+
+    fetchStats();
+
+    // Subscribe to realtime executions
+    const channel = supabase.channel('demo_feed')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'trade_execution_log' }, (payload) => {
+        setTotalDecisions(prev => prev + 1);
+        if (payload.new.decision === 'REFUSED') {
+          setRefusedCount(prev => prev + 1);
+        }
+        setFeed(prev => [payload.new, ...prev].slice(0, 8));
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
-  const initiatePol = async () => {
-    setLoading(true);
-    const res = await fetch('/api/trustrails/initiate-pol', {
-      method: 'POST',
-      body: JSON.stringify({ wallet_address: wallet })
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (res.ok) {
-      setDbtTokenId(data.dbt_token_id);
-      setStep(2);
-    } else {
-      alert(data.error);
-    }
-  };
-
-  const verifyFactor = async (type: string, value: string) => {
-    setLoading(true);
-    const res = await fetch('/api/trustrails/verify-factor', {
-      method: 'POST',
-      body: JSON.stringify({ dbt_token_id: dbtTokenId, factor_type: type, value })
-    });
-    const data = await res.json();
-    setLoading(false);
-    
-    if (res.ok) {
-      setFactorsVerified(data.factors_verified);
-      if (data.complete) {
-        setSbtResult(data);
-        generateReceipt(data.sbt_token_id);
-        setStep(6);
-      } else {
-        if (type === 'email') setStep(3);
-        if (type === 'sms') setStep(4);
-        if (type === 'biometric') setStep(5);
-      }
-    } else {
-      alert(data.error);
-    }
-  };
-
-  const verifyWalletSig = async () => {
-    if (!(window as any).ethereum) {
-      alert('MetaMask not found');
-      return;
-    }
-    setLoading(true);
-    try {
-      const provider = new ethers.BrowserProvider((window as any).ethereum);
-      const signer = await provider.getSigner();
-      const timestamp = Date.now();
-      const message = `TrustRails PoL verification | ${dbtTokenId} | ${timestamp}`;
-      const signature = await signer.signMessage(message);
-      
-      await verifyFactor('wallet_sig', JSON.stringify({ signature, message }));
-    } catch (err: any) {
-      alert(err.message);
-      setLoading(false);
-    }
-  };
-
-  const generateReceipt = async (sbt_token_id: string) => {
-    const res = await fetch('/api/trustrails/generate-compliance-receipt', {
-      method: 'POST',
-      body: JSON.stringify({
-        sbt_token_id,
-        agent_id: 'TRINITY-DEMO',
-        transaction_type: 'POL_ONBOARDING',
-        amount_usdc: 100 // dummy test value
-      })
-    });
-    const data = await res.json();
-    if (res.ok) {
-      setSbtResult((prev: any) => ({ ...prev, receipt_id: data.receipt_id }));
-    }
+  const handleWaitlist = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('loading');
+    const { error } = await supabase
+      .from('waitlist')
+      .insert([{ email, source: 'trusttrader_demo' }]);
+    if (error) setStatus('error');
+    else setStatus('success');
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'sans-serif', backgroundColor: '#111', color: '#fff' }}>
-      
-      {/* LEFT COLUMN: WIZARD */}
-      <div style={{ flex: 1, padding: '40px', borderRight: '1px solid #333' }}>
-        <h1 style={{ fontSize: '24px', marginBottom: '30px', color: '#4ADE80' }}>TrustRails PoL Verification Wizard</h1>
+    <div className="min-h-screen bg-[#0a0f1a] text-[#f8fafc] font-sans overflow-x-hidden">
+      {/* Signal Strip */}
+      <div className="bg-[#1e293b] text-xs font-mono py-2 border-b border-[#334155] flex justify-center space-x-6 text-amber-500">
+        <span>Fear/Greed: {signals.fg}</span>
+        <span className="text-[#475569]">|</span>
+        <span>BTC: ${signals.btc}</span>
+        <span className="text-[#475569]">|</span>
+        <span>RSI: {signals.rsi}</span>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-6 py-16 space-y-24">
         
-        {step === 1 && (
-          <div style={{ padding: '20px', backgroundColor: '#222', borderRadius: '8px' }}>
-            <h2>[1] Initiate PoL</h2>
-            <p style={{ color: '#aaa', marginBottom: '15px' }}>Enter wallet address to begin proof of life verification.</p>
-            <input 
-              value={wallet} 
-              onChange={e => setWallet(e.target.value)} 
-              placeholder="0x..." 
-              style={{ padding: '10px', width: '100%', marginBottom: '15px', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '4px' }}
-            />
-            <button 
-              onClick={initiatePol} 
-              disabled={loading || !wallet}
-              style={{ padding: '10px 20px', backgroundColor: '#4ADE80', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              {loading ? 'Initializing...' : 'Start Verification'}
-            </button>
-          </div>
-        )}
+        {/* SECTION 1 - LIVE PROOF */}
+        <section className="text-center space-y-6">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-6">
+            AI agents that refuse bad trades — <br/>
+            <span className="text-amber-500">and prove it on-chain.</span>
+          </h1>
+          <p className="text-xl text-[#94a3b8] max-w-3xl mx-auto">
+            SOPHIA has made <span className="text-white font-mono">{totalDecisions}</span> constitutional decisions.{' '}
+            <span className="text-amber-500 font-mono">{refusedCount}</span> trades refused. Capital preserved.
+          </p>
 
-        {step === 2 && (
-          <div style={{ padding: '20px', backgroundColor: '#222', borderRadius: '8px' }}>
-            <h2>[2] Email Verification</h2>
-            <p style={{ color: '#aaa', marginBottom: '15px' }}>DBT created: <strong>{dbtTokenId}</strong><br/>Enter the 6-digit OTP sent to your email (check server console).</p>
-            <input 
-              value={emailOtp} 
-              onChange={e => setEmailOtp(e.target.value)} 
-              placeholder="000000" 
-              style={{ padding: '10px', width: '100%', marginBottom: '15px', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '4px' }}
-            />
-            <button 
-              onClick={() => verifyFactor('email', emailOtp)} 
-              disabled={loading || !emailOtp}
-              style={{ padding: '10px 20px', backgroundColor: '#4ADE80', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              {loading ? 'Verifying...' : 'Verify Email'}
-            </button>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div style={{ padding: '20px', backgroundColor: '#222', borderRadius: '8px' }}>
-            <h2>[3] SMS Verification</h2>
-            <p style={{ color: '#aaa', marginBottom: '15px' }}>✅ Factor 1/4 verified — Email confirmed<br/>Enter the 6-digit OTP sent to your phone (check console).</p>
-            <input 
-              value={smsOtp} 
-              onChange={e => setSmsOtp(e.target.value)} 
-              placeholder="000000" 
-              style={{ padding: '10px', width: '100%', marginBottom: '15px', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '4px' }}
-            />
-            <button 
-              onClick={() => verifyFactor('sms', smsOtp)} 
-              disabled={loading || !smsOtp}
-              style={{ padding: '10px 20px', backgroundColor: '#4ADE80', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              {loading ? 'Verifying...' : 'Verify Phone'}
-            </button>
-          </div>
-        )}
-
-        {step === 4 && (
-          <div style={{ padding: '20px', backgroundColor: '#222', borderRadius: '8px' }}>
-            <h2>[4] Biometric Confirmation</h2>
-            <p style={{ color: '#aaa', marginBottom: '15px' }}>✅ Factor 2/4 verified — Phone confirmed<br/>Confirm biometric liveness check.</p>
-            <button 
-              onClick={() => verifyFactor('biometric', 'biometric_confirmed_' + Date.now())} 
-              disabled={loading}
-              style={{ padding: '10px 20px', backgroundColor: '#4ADE80', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              {loading ? 'Processing...' : 'Simulate Liveness Pass'}
-            </button>
-          </div>
-        )}
-
-        {step === 5 && (
-          <div style={{ padding: '20px', backgroundColor: '#222', borderRadius: '8px' }}>
-            <h2>[5] Wallet Signature</h2>
-            <p style={{ color: '#aaa', marginBottom: '15px' }}>✅ Factor 3/4 verified — Biometric confirmed<br/>Sign challenge to prove custody of {wallet}.</p>
-            <button 
-              onClick={verifyWalletSig} 
-              disabled={loading}
-              style={{ padding: '10px 20px', backgroundColor: '#4ADE80', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              {loading ? 'Waiting for wallet...' : 'Sign with MetaMask'}
-            </button>
-          </div>
-        )}
-
-        {step === 6 && sbtResult && (
-          <div style={{ padding: '30px', backgroundColor: '#132c1b', border: '1px solid #4ADE80', borderRadius: '8px' }}>
-            <h2 style={{ color: '#4ADE80', marginBottom: '10px' }}>CONVERSION COMPLETE</h2>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, lineHeight: '2' }}>
-              <li>🏆 <strong>SBT Minted:</strong> {sbtResult.sbt_token_id}</li>
-              <li>📍 <strong>On-chain:</strong> <a href={`https://sepolia.basescan.org/tx/${sbtResult.on_chain_tx_hash}`} target="_blank" style={{color: '#60A5FA'}}>Base Sepolia Explorer</a></li>
-              <li>🛡️ <strong>Qualification Tier:</strong> Retail (verified)</li>
-              <li>📋 <strong>Compliance Receipt:</strong> {sbtResult.receipt_id || 'Generating...'}</li>
-            </ul>
-          </div>
-        )}
-      </div>
-
-      {/* RIGHT COLUMN: EVENTS */}
-      <div style={{ width: '400px', backgroundColor: '#1a1a1a', padding: '40px', overflowY: 'auto' }}>
-        <h2 style={{ fontSize: '18px', marginBottom: '20px', borderBottom: '1px solid #333', paddingBottom: '10px' }}>Live Trust Events</h2>
-        {events.map((ev) => (
-          <div key={ev.id} style={{ padding: '15px', backgroundColor: '#222', marginBottom: '10px', borderRadius: '6px', fontSize: '13px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ fontWeight: 'bold', color: '#60A5FA' }}>{ev.event_type}</span>
-              <span style={{ color: '#666' }}>{new Date(ev.created_at).toLocaleTimeString()}</span>
+          <div className="mt-12 bg-[#0f172a] border border-[#1e293b] rounded-lg overflow-hidden text-left shadow-2xl">
+            <div className="bg-[#1e293b] px-4 py-2 border-b border-[#334155] text-xs font-mono text-[#94a3b8]">Live Execution Log (Last 8)</div>
+            <div className="p-4 space-y-3 font-mono text-xs">
+              {feed.map((log, i) => (
+                <div key={log.id || i} className="flex items-center space-x-4 border-b border-[#1e293b] pb-2 last:border-0 last:pb-0 animate-fade-in-down">
+                  <span className="text-[#475569] shrink-0 w-20">
+                    {new Date(log.created_at).toLocaleTimeString([], { hour12: false })}
+                  </span>
+                  <span className={`shrink-0 w-20 font-bold ${log.decision === 'REFUSED' ? 'text-amber-500' : 'text-green-500'}`}>
+                    {log.decision}
+                  </span>
+                  <span className="shrink-0 w-16 text-[#94a3b8]">{(log.unity_score || 0).toFixed(4)}</span>
+                  <span className="truncate flex-1 text-[#cbd5e1]">{log.reason}</span>
+                  {log.tx_hash && (
+                    <a href={`https://basescan.org/tx/${log.tx_hash}`} target="_blank" rel="noreferrer" className="text-blue-400 hover:text-blue-300 shrink-0">
+                      View Tx ↗
+                    </a>
+                  )}
+                </div>
+              ))}
+              {feed.length === 0 && <div className="text-center text-[#475569] py-4">Awaiting signal inputs...</div>}
             </div>
-            <div style={{ color: '#aaa', wordBreak: 'break-all' }}>Subject: {ev.subject_id}</div>
-            <pre style={{ margin: '8px 0 0 0', padding: '8px', backgroundColor: '#111', color: '#888', borderRadius: '4px', fontSize: '11px', overflowX: 'hidden' }}>
-              {JSON.stringify(ev.event_data, null, 2)}
-            </pre>
           </div>
-        ))}
-      </div>
+        </section>
 
+        {/* SECTION 2 - THREE LAYER EXPLAINER */}
+        <section className="space-y-12 py-12 border-t border-b border-[#1e293b]">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            
+            {/* Box 1 */}
+            <div className="relative group bg-[#0f172a] border border-[#334155] hover:border-amber-500 transition-colors p-6 rounded-xl flex-1 text-center h-48 flex flex-col justify-center shadow-lg">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-[#0a0f1a] text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-md">
+                SOPHIA RepID: {repIdScore} / 10,000 — Conservator-backed — up to $250 coverage
+              </div>
+              <div className="text-3xl mb-3">✉️</div>
+              <h3 className="font-bold text-white mb-2">POSTCARD</h3>
+              <p className="text-sm text-[#94a3b8]">Fast ZKP check. Proves agent has standing. Sub-second. Free.</p>
+            </div>
+
+            <div className="hidden md:block text-[#475569] text-2xl font-light">→</div>
+            
+            {/* Box 2 */}
+            <div className="bg-[#0f172a] border border-[#334155] p-6 rounded-xl flex-1 text-center h-48 flex flex-col justify-center">
+              <div className="text-3xl mb-3">📨</div>
+              <h3 className="font-bold text-white mb-2">ENVELOPE</h3>
+              <p className="text-sm text-[#94a3b8]">Verified data exchange. Constitutional rules + decision history. Gated by RepID.</p>
+            </div>
+
+            <div className="hidden md:block text-[#475569] text-2xl font-light">→</div>
+
+            {/* Box 3 */}
+            <div className="bg-[#0f172a] border border-[#334155] p-6 rounded-xl flex-1 text-center h-48 flex flex-col justify-center">
+              <div className="text-3xl mb-3">📦</div>
+              <h3 className="font-bold text-white mb-2">PACKAGE</h3>
+              <p className="text-sm text-[#94a3b8]">Sovereign encrypted data. Tax records, full history. Only you hold the keys.</p>
+            </div>
+
+          </div>
+          <p className="text-center text-[#94a3b8] italic">
+            "ZKP RepID is the mesh that makes ERC-8004 identity useful and x402 payments safe."
+          </p>
+        </section>
+
+        {/* SECTION 3 - TRY IT */}
+        <section className="text-center max-w-lg mx-auto pb-24">
+          <h2 className="text-2xl font-bold text-white mb-6">Experience the Protocol</h2>
+          
+          <form onSubmit={handleWaitlist} className="space-y-4">
+            <input 
+              type="email" 
+              required
+              placeholder="Enter email to begin"
+              className="w-full px-4 py-3 bg-[#0a0f1a] border border-[#334155] rounded-lg focus:outline-none focus:border-amber-500 text-white placeholder-[#475569] text-center"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={status === 'loading' || status === 'success'}
+            />
+            <button 
+              type="submit" 
+              disabled={status === 'loading' || status === 'success'}
+              className="w-full px-6 py-4 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg transition-colors shadow-lg disabled:opacity-50"
+            >
+              {status === 'loading' ? 'Processing...' : status === 'success' ? 'Welcome to TrustTrader' : 'Watch SOPHIA trade for you →'}
+            </button>
+          </form>
+
+          {status === 'error' && <p className="text-red-400 text-sm mt-4">Failed to join waitlist. Please try again.</p>}
+          <p className="text-xs text-[#475569] mt-6">
+            No wallet needed. Paper trading only. Your first decision creates your on-chain credential.
+          </p>
+        </section>
+
+      </div>
     </div>
   );
 }
