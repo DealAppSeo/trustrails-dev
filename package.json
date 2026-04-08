@@ -23,6 +23,7 @@
     "postcss": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "recharts": "^3.8.1",
     "tailwind-merge": "latest",
     "tailwindcss": "latest"
   },
