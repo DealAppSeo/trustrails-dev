@@ -42,15 +42,22 @@ export function RiskSlider({ onRepIDChange }: { onRepIDChange?: (score: number) 
     
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
       
-      const res = await fetch('/api/trustrails/repid/configure', {
+      const fetchPromise = fetch('/api/trustrails/repid/configure', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ institutionId: 'demo-judge', weights }),
         signal: controller.signal
       });
-      clearTimeout(timeoutId);
+      
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => {
+          controller.abort();
+          reject(new Error('Recalculation timed out. Please try again.'));
+        }, 5000)
+      );
+      
+      const res = await Promise.race([fetchPromise, timeoutPromise]) as Response;
       
       if (!res.ok) throw new Error('Failed to recalculate RepID');
       
@@ -67,7 +74,7 @@ export function RiskSlider({ onRepIDChange }: { onRepIDChange?: (score: number) 
       console.error("Recalculation error or timeout:", err);
       // restore previous RepID
       setSophiaRepID(prevRepID);
-      setErrorMsg('Recalculation timed out. Please try again.');
+      setErrorMsg(err.message || 'Recalculation timed out. Please try again.');
     } finally {
       setLoading(false);
     }
