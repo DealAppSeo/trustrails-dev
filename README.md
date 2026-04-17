@@ -20,6 +20,26 @@
 
 ---
 
+---
+
+## Protocol Foundation
+
+| Standard | Role | Layer |
+|----------|------|-------|
+| [ERC-7231](https://eips.ethereum.org/EIPS/eip-7231) | Human identity binding | Users |
+| [ERC-8004](https://github.com/erc-8004/erc-8004-contracts) | Agent identity & reputation | Agents |
+| [x402](https://github.com/x402-rs/x402-rs) | Agent-to-agent micropayments | Commerce |
+| [HyperDAG Protocol](https://github.com/DealAppSeo/hyperdag-protocol) | Constitutional trust via HAL + ZKP RepID | Trust |
+
+**The HAL constitutional layer:**              Dissonance formula:
+d = (0.4×harm + 0.3×epistemic + 0.2×evidence + 0.1×scope) × (531441/524288)
+d > 0.0195  →  VETO (action blocked)
+d < 0.0195  →  APPROVE (proceed with compliance receipt)
+ZKP RepID:  earned behavioral credential, non-transferable, on-chain
+SBFA:       3-LLM Byzantine fault tolerance against correlated hallucination
+
+---
+
 ## What Is TrustRails?
 
 AI agents are already moving institutional money. Treasury agents, trading agents, settlement agents — running 24 hours a day without human intervention. But nobody has answered the question every compliance officer asks:
