@@ -6,3 +6,5 @@ node_modules/
 *.log
 .DS_Store
 agent0-registration.log
+
+.vercel

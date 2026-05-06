@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 const DEFAULTS: Record<string, any> = {
   sophia: {
     repid_earned: 1247,

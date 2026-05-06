@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { headers } from 'next/headers';
 import { WaitlistForm } from './WaitlistForm';
 
-export default function Home() {
-  const headersList = headers();
+export default async function Home() {
+  const headersList = await headers();
   const host = headersList.get('host') || '';
 
   if (host.includes('trusttrader')) {
@@ -246,7 +246,7 @@ export default function Home() {
         marginTop: '16px',
         fontFamily: 'monospace'
       }}>
-        🔒 Proprietary Technology · Patent Portfolio Pending (P-001–P-028)
+        🔒 Proprietary Technology
       </div>
     </div>
   );

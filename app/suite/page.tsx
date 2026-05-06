@@ -237,7 +237,7 @@ export default function SuiteHome() {
         fontFamily: 'monospace',
         paddingBottom: '32px'
       }}>
-        <div style={{ marginBottom: '8px' }}>🔒 Proprietary Technology · Patent Portfolio Pending (P-001–P-028)</div>
+        <div style={{ marginBottom: '8px' }}>🔒 Proprietary Technology</div>
         <div style={{ color: '#64748b' }}>HyperDAG Protocol · TrustRails · TrustTrader · TrustShell · TrustCRE</div>
       </div>
     </div>

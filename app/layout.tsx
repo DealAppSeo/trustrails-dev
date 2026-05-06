@@ -29,7 +29,7 @@ export default function RootLayout({
           fontFamily: 'monospace'
         }}>
           © 2026 HyperDAG Protocol · TrustRails ·
-          Patent Portfolio Pending (P-001–P-028) ·
+
           Proprietary Technology — All Rights Reserved
         </footer>
       </body>
