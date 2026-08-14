@@ -1,0 +1,112 @@
+# BASELINE recorder for trustrails-dev. This job DOES NOT GATE.
+#
+# WHY IT DOES NOT GATE. This repo serves a live domain and currently has 119
+# `tsc` errors, and `next build` fails outright. Attaching a blocking gate to
+# that would make every PR red from the first day, and a permanently-red gate
+# is not a gate -- people learn to merge past it, and then it is worse than
+# having none because the repo now *looks* checked.
+#
+# WHY IT IS NOT JUST `continue-on-error` EITHER. A step that fails but is
+# allowed to pass renders as a green tick, which is the house defect this
+# fleet keeps logging: a system reporting success it has not earned. So this
+# job reports THREE outcomes explicitly -- VERIFIED / FAILED / NOT CHECKED --
+# writes the counts into the job summary where a human actually reads them,
+# and only then exits 0. The green tick here means "the baseline was recorded",
+# never "the code is healthy".
+#
+# WHAT IT IS FOR. Two things a blocking gate could not do here:
+#   1. It makes the number visible on every PR, so drift is obvious. 119 -> 130
+#      is a regression; 119 -> 90 is progress. Nobody can see that today.
+#   2. It gives the eventual cleanup a target that is measured rather than
+#      guessed, and the day the counts reach zero this file becomes a real gate
+#      by deleting the `|| true`s.
+#
+# MEASURED 2026-08-14 on 4171e91, which is what these numbers should be read
+# against:
+#   npx tsc --noEmit  -> 119 errors. 51 are `Cannot find module '@/lib/utils'`;
+#                        the rest are radix-ui / class-variance-authority /
+#                        next-themes. Cause: a components/ui (shadcn) drop whose
+#                        dependencies were never installed and whose lib/utils.ts
+#                        was never added. Those files appear to be unimported,
+#                        which is how the site ships despite them.
+#   npm run build     -> FAILS at app/api/repid/[address], "Failed to collect
+#                        page data". Cause: module-scope createClient() in 6+
+#                        routes. `next build` imports every route module to
+#                        collect page data, so a client constructed at module
+#                        scope runs at BUILD time and dies without keys. This is
+#                        the same defect that broke every trinity-ecosystem
+#                        deploy from 2026-06-05 to 2026-08-11 -- see that repo's
+#                        CLAUDE.md, "Never construct a Supabase client at module
+#                        scope". Fixing it is a separate PR, deliberately.
+
+name: baseline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # `npm install`, not `npm ci`: this repo's lockfile state is unmeasured,
+      # and a recorder that cannot get past install records nothing. Promote to
+      # `npm ci` once the lockfile is known good.
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      - name: Record typecheck baseline
+        id: tsc
+        run: |
+          npx tsc --noEmit > tsc.log 2>&1 || true
+          count=$(grep -c 'error TS' tsc.log || true)
+          echo "count=${count}" >> "$GITHUB_OUTPUT"
+          echo "tsc errors: ${count}"
+
+      - name: Record build baseline
+        id: build
+        run: |
+          if npm run build > build.log 2>&1; then
+            echo "result=VERIFIED" >> "$GITHUB_OUTPUT"
+          else
+            echo "result=FAILED" >> "$GITHUB_OUTPUT"
+          fi
+          tail -30 build.log || true
+
+      # The summary is the deliverable. A reader must be able to tell "measured
+      # and healthy" from "measured and broken" from "not measured at all"
+      # without opening the logs.
+      - name: Write baseline summary
+        run: |
+          {
+            echo "## trustrails-dev baseline"
+            echo ""
+            echo "This job records state. **It does not gate, and a green tick here"
+            echo "does not mean the code is healthy.**"
+            echo ""
+            echo "| check | outcome | reference (4171e91) |"
+            echo "|---|---|---|"
+            if [ "${{ steps.tsc.outputs.count }}" = "0" ]; then
+              echo "| \`tsc --noEmit\` | **VERIFIED** — 0 errors | was 119 |"
+            else
+              echo "| \`tsc --noEmit\` | **FAILED** — ${{ steps.tsc.outputs.count }} errors | was 119 |"
+            fi
+            echo "| \`next build\` | **${{ steps.build.outputs.result }}** | was FAILED |"
+            echo "| tests | **NOT CHECKED** — no test script in package.json | — |"
+            echo ""
+            echo "Known causes, both tracked separately:"
+            echo "- typecheck: an unimported \`components/ui\` (shadcn) drop with missing deps and no \`lib/utils.ts\`."
+            echo "- build: module-scope \`createClient()\` in 6+ routes; \`next build\` imports every route module."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Exits 0 on purpose. See the header: this records, it does not gate.
+      - name: Done
+        run: echo "Baseline recorded. This job intentionally does not fail the run."
