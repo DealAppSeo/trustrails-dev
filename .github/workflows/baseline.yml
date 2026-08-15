@@ -39,11 +39,11 @@
 #                        see that repo's CLAUDE.md, "Never construct a Supabase
 #                        client at module scope". All 26 now construct lazily.
 #
-# THE BUILD STEP IS THEREFORE A CANDIDATE FOR PROMOTION TO A REAL GATE. It is
-# left recording rather than gating for one more cycle on purpose: it has passed
-# exactly once, locally, and a gate whose first CI run is also its first-ever
-# green run is a coin toss. Promote it after it has been observed green here.
-# The typecheck step is NOT a candidate -- 119 errors remain.
+# THE BUILD IS NOW GATED, in the separate `build` job above, promoted once the
+# pre-registered condition was met (observed green in CI, not just locally).
+# It is still RECORDED here too, so the summary table stays complete and a
+# regression is legible in one place rather than only as a red job.
+# Typecheck is still NOT gated -- 119 errors remain.
 
 name: baseline
 
@@ -53,6 +53,34 @@ on:
   pull_request:
 
 jobs:
+  # THIS ONE GATES. Split out rather than folded into `baseline`, because that
+  # job is documented as never failing and quietly making it fail would break its
+  # contract with anyone reading a green tick.
+  #
+  # Promoted 2026-08-15 against a pre-registered condition: `next build` was to
+  # gate only once it had been OBSERVED green in CI, not merely locally. It was
+  # (run 31853744440, `next build` VERIFIED on a GitHub runner) and independently
+  # on Vercel, where this project had been in state ERROR for the whole session.
+  # A gate whose first CI run is also its first-ever green run is a coin toss;
+  # this one has two independent greens behind it.
+  #
+  # Typecheck is NOT here, and will not be until it reaches 0. 119 errors remain,
+  # from an unimported components/ui drop. The baseline job below keeps counting
+  # them so the number stays visible on every PR.
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install
+        run: npm install --no-audit --no-fund
+      # No `|| true`. A failure here fails the PR, which is the whole point.
+      - name: Build must succeed
+        run: npm run build
+
   baseline:
     runs-on: ubuntu-latest
     steps:
