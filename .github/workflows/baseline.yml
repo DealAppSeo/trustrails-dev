@@ -29,15 +29,21 @@
 #                        dependencies were never installed and whose lib/utils.ts
 #                        was never added. Those files appear to be unimported,
 #                        which is how the site ships despite them.
-#   npm run build     -> FAILS at app/api/repid/[address], "Failed to collect
-#                        page data". Cause: module-scope createClient() in 6+
-#                        routes. `next build` imports every route module to
-#                        collect page data, so a client constructed at module
-#                        scope runs at BUILD time and dies without keys. This is
-#                        the same defect that broke every trinity-ecosystem
-#                        deploy from 2026-06-05 to 2026-08-11 -- see that repo's
-#                        CLAUDE.md, "Never construct a Supabase client at module
-#                        scope". Fixing it is a separate PR, deliberately.
+#   npm run build     -> FIXED 2026-08-15, now exit 0. It previously failed at
+#                        "Collecting page data" with `supabaseUrl is required`.
+#                        Cause: module-scope createClient() across 26 files --
+#                        `next build` imports every route module, so a client
+#                        constructed at module scope runs at BUILD time and dies
+#                        without keys. Same defect that broke every
+#                        trinity-ecosystem deploy from 2026-06-05 to 2026-08-11;
+#                        see that repo's CLAUDE.md, "Never construct a Supabase
+#                        client at module scope". All 26 now construct lazily.
+#
+# THE BUILD STEP IS THEREFORE A CANDIDATE FOR PROMOTION TO A REAL GATE. It is
+# left recording rather than gating for one more cycle on purpose: it has passed
+# exactly once, locally, and a gate whose first CI run is also its first-ever
+# green run is a coin toss. Promote it after it has been observed green here.
+# The typecheck step is NOT a candidate -- 119 errors remain.
 
 name: baseline
 

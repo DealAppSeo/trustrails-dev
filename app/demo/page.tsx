@@ -1,11 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://qnnpjhlxljtqyigedwkb.supabase.co',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-);
+import { getSupabaseBrowser } from '@/lib/supabase-browser';
 
 export default function ProtocolDemo() {
   const [totalDecisions, setTotalDecisions] = useState(0);
@@ -21,8 +16,7 @@ export default function ProtocolDemo() {
     // Initial fetch
     const fetchStats = async () => {
       // Get all decisions
-      const { data: decisions } = await supabase
-        .from('trade_execution_log')
+      const { data: decisions } = await getSupabaseBrowser().from('trade_execution_log')
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -33,8 +27,7 @@ export default function ProtocolDemo() {
       }
 
       // Get signals
-      const { data: sigData } = await supabase
-        .from('trusttrader_signals')
+      const { data: sigData } = await getSupabaseBrowser().from('trusttrader_signals')
         .select('*');
 
       if (sigData) {
@@ -48,7 +41,7 @@ export default function ProtocolDemo() {
     fetchStats();
 
     // Subscribe to realtime executions
-    const channel = supabase.channel('demo_feed')
+    const channel = getSupabaseBrowser().channel('demo_feed')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'trade_execution_log' }, (payload) => {
         setTotalDecisions(prev => prev + 1);
         if (payload.new.decision === 'REFUSED') {
@@ -58,14 +51,13 @@ export default function ProtocolDemo() {
       })
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { getSupabaseBrowser().removeChannel(channel); };
   }, []);
 
   const handleWaitlist = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
-    const { error } = await supabase
-      .from('waitlist')
+    const { error } = await getSupabaseBrowser().from('waitlist')
       .insert([{ email, source: 'trusttrader_demo' }]);
     if (error) setStatus('error');
     else setStatus('success');
