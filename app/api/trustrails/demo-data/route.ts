@@ -1,35 +1,28 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-  
-  if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.json({ error: 'Missing Supabase credentials' }, { status: 500 });
-  }
-
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  // The credential guard that stood here is now inside getSupabaseAdmin(), which
+  // throws and names the missing variable. That is strictly more informative
+  // than the flat "Missing Supabase credentials" this returned, and it keeps the
+  // check in one place instead of restating it per route.
 
   // 1. Fetch real Solana tx hashes from kya_compliance_receipts
-  const { data: receipts } = await supabase
-    .from('kya_compliance_receipts')
+  const { data: receipts } = await getSupabaseAdmin().from('kya_compliance_receipts')
     .select('solana_tx_hash, payment_amount_usdc, created_at, receipt_id')
     .not('solana_tx_hash', 'is', null)
     .order('created_at', { ascending: false })
     .limit(3);
 
   // 2. Fetch real agent names/RepID from agent_kya_registry
-  const { data: agents } = await supabase
-    .from('agent_kya_registry')
+  const { data: agents } = await getSupabaseAdmin().from('agent_kya_registry')
     .select('agent_name, id, repid_score, repid_tier, human_custody_verified, lifecycle_state, custodian_link_active, custodian_tier')
     .order('repid_score', { ascending: false });
 
   // 3. Stats for stats bar
-  const { data: allReceipts } = await supabase
-    .from('kya_compliance_receipts')
+  const { data: allReceipts } = await getSupabaseAdmin().from('kya_compliance_receipts')
     .select('payment_amount_usdc, created_at')
     .gt('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
 
@@ -37,8 +30,7 @@ export async function GET() {
   const volumeProtected = allReceipts?.reduce((sum, r) => sum + (r.payment_amount_usdc || 0), 0) || 0;
   const lastBft = allReceipts?.length ? Math.max(...allReceipts.map(r => new Date(r.created_at).getTime())) : Date.now();
 
-  const { data: sprintReports } = await supabase
-    .from('sprint_reports')
+  const { data: sprintReports } = await getSupabaseAdmin().from('sprint_reports')
     .select('content')
     .eq('report_type', 'veritas_hallucination_check')
     .order('created_at', { ascending: false })

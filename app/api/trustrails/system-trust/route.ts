@@ -2,25 +2,11 @@
 // TrustRails Sprint — Created March 26 2026 by Gemini
 
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const _supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const _supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!_supabaseUrl) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL in Vercel Environment');
-}
-if (!_supabaseKey) {
-  throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY or ANON_KEY in Vercel Environment');
-}
-
-
-const supabase = createClient(_supabaseUrl, _supabaseKey);
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 export async function GET() {
   // Pull all 12 agent RepID scores
-  const { data: agents } = await supabase
-    .from('agent_kya_registry')
+  const { data: agents } = await getSupabaseAdmin().from('agent_kya_registry')
     .select('agent_name, repid_score, repid_tier, insurance_coverage, human_custody_verified');
 
   if (!agents || agents.length === 0) {
@@ -37,8 +23,7 @@ export async function GET() {
 
   // Recent payment stats
   const since24h = new Date(Date.now() - 86_400_000).toISOString();
-  const { data: receipts } = await supabase
-    .from('kya_compliance_receipts')
+  const { data: receipts } = await getSupabaseAdmin().from('kya_compliance_receipts')
     .select('payment_amount_usdc, bft_passed')
     .gte('created_at', since24h);
 
@@ -58,8 +43,7 @@ export async function GET() {
     status === 'MONITORING' ? '#f59e0b' :  // amber
     '#ef4444';                             // red
 
-  const { data: humanSbts } = await supabase
-    .from('human_sbt_registry')
+  const { data: humanSbts } = await getSupabaseAdmin().from('human_sbt_registry')
     .select('id, qualification_tier, active_custodianships, total_agents_graduated');
 
   const totalHumanCustodians = humanSbts?.length || 0;
@@ -104,6 +88,5 @@ export async function GET() {
     },
   });
 }
-
 
 export const dynamic = 'force-dynamic';

@@ -1,22 +1,12 @@
 // lib/trustshell/KYAValidator.ts
 // TrustShell Sprint — Created March 26 2026 by Gemini
 
-import { createClient } from '@supabase/supabase-js';
-
-const _supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const _supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!_supabaseUrl) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL in Vercel Environment');
-}
-if (!_supabaseKey) {
-  throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY or ANON_KEY in Vercel Environment');
-}
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 import type { AgentKYAProfile, KYAComplianceResult } from './types';
 
 export class KYAValidator {
-  private supabase = createClient(_supabaseUrl, _supabaseKey);
+  private get supabase() { return getSupabaseAdmin(); }
 
   async getAgentProfile(agentName: string): Promise<AgentKYAProfile | null> {
     const { data, error } = await this.supabase

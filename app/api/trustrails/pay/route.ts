@@ -2,7 +2,7 @@
 // TrustShell Sprint — Created March 26 2026 by Gemini
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import {
   KYAValidator, BFTAuthorizer, ComplianceReceiptGenerator,
   SolanaExecutor,
@@ -11,10 +11,6 @@ import {
 
 export async function POST(req: NextRequest) {
   const { agentName, amountUSDC, recipientAddress, purpose, signatures } = await req.json();
-
-  const _supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '';
-  const _supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-  const supabase = createClient(_supabaseUrl, _supabaseKey);
 
   const kya        = new KYAValidator();
   const bft        = new BFTAuthorizer();
@@ -65,7 +61,7 @@ export async function POST(req: NextRequest) {
     if (amountUSDC > SINGLE_SIG_THRESHOLD) {
       if (!signatures || signatures.length < 2) {
         
-        await supabase.from('pending_authorizations').insert({
+        await getSupabaseAdmin().from('pending_authorizations').insert({
           agent_name: agentName,
           amount_usdc: amountUSDC,
           recipient_address: recipientAddress,
@@ -160,6 +156,5 @@ async function sha256(data: string): Promise<string> {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
-
 
 export const dynamic = 'force-dynamic';
