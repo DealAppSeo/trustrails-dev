@@ -1,11 +1,7 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import crypto from 'crypto';
 import { ethers } from 'ethers';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function POST(req: Request) {
   try {
@@ -17,8 +13,7 @@ export async function POST(req: Request) {
     }
 
     // Get current DBT state
-    const { data: dbt, error: dbtError } = await supabase
-      .from('dbt_registry')
+    const { data: dbt, error: dbtError } = await getSupabaseAdmin().from('dbt_registry')
       .select('*')
       .eq('token_id', dbt_token_id)
       .single();
@@ -37,8 +32,7 @@ export async function POST(req: Request) {
     if (factor_type === 'email' || factor_type === 'sms') {
       const hashedValue = crypto.createHash('sha256').update(value).digest('hex');
 
-      const { data: session } = await supabase
-        .from('pol_otp_sessions')
+      const { data: session } = await getSupabaseAdmin().from('pol_otp_sessions')
         .select('*')
         .eq('dbt_token_id', dbt_token_id)
         .eq('otp_type', factor_type)
@@ -54,8 +48,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Invalid OTP' }, { status: 400 });
       }
 
-      await supabase
-        .from('pol_otp_sessions')
+      await getSupabaseAdmin().from('pol_otp_sessions')
         .update({ verified: true, used_at: new Date().toISOString() })
         .eq('id', session.id);
 
@@ -66,8 +59,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Invalid biometric hash' }, { status: 400 });
       }
 
-      await supabase
-        .from('dbt_registry')
+      await getSupabaseAdmin().from('dbt_registry')
         .update({ biometric_hash: value })
         .eq('token_id', dbt_token_id);
 
@@ -94,8 +86,7 @@ export async function POST(req: Request) {
           return NextResponse.json({ error: 'Invalid wallet signature' }, { status: 403 });
         }
 
-        await supabase
-          .from('dbt_registry')
+        await getSupabaseAdmin().from('dbt_registry')
           .update({ wallet_sig_verified: true })
           .eq('token_id', dbt_token_id);
 
@@ -108,10 +99,10 @@ export async function POST(req: Request) {
     }
 
     // Update factor count
-    await supabase.from('dbt_registry').update({ factors_verified: newFactorsVerified }).eq('token_id', dbt_token_id);
+    await getSupabaseAdmin().from('dbt_registry').update({ factors_verified: newFactorsVerified }).eq('token_id', dbt_token_id);
 
     // Call trust event
-    await supabase.rpc('create_trust_event', {
+    await getSupabaseAdmin().rpc('create_trust_event', {
       p_event_type: 'pol_factor_verified',
       p_subject_id: dbt_token_id,
       p_institution_id: instId,
@@ -122,7 +113,7 @@ export async function POST(req: Request) {
     if (newFactorsVerified >= 4) {
       console.log(`[TrustRails] Initiating conversion for ${dbt_token_id}`);
       
-      const { data: sbtData, error: sbtError } = await supabase.rpc('convert_dbt_to_sbt', {
+      const { data: sbtData, error: sbtError } = await getSupabaseAdmin().rpc('convert_dbt_to_sbt', {
         p_dbt_token_id: dbt_token_id,
         p_wallet_address: dbt.wallet_address,
         p_institution_id: instId
@@ -184,8 +175,7 @@ export async function POST(req: Request) {
          on_chain_tx_hash = 'tx_failed';
       }
       
-      await supabase
-        .from('human_sbt_registry')
+      await getSupabaseAdmin().from('human_sbt_registry')
         .update({ on_chain_tx_hash: on_chain_tx_hash })
         .eq('token_id', sbt_token_id);
 

@@ -1,10 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 // ---------------------------------------------------------------------------
 // TWO DEFECTS FIXED HERE. Both were proved before the change, not inferred.
@@ -87,15 +82,19 @@ export async function POST(req: Request) {
 
     // 122 bits from the platform CSPRNG. At this width a collision is not
     // something to plan for; at the previous 16 bits it was something to expect.
-    // Web Crypto rather than `node:crypto`: this project ships no @types/node
-    // (the pre-existing `process.env` lines fail typecheck for the same reason),
-    // and globalThis.crypto works in both the Node and Edge runtimes.
+    // Web Crypto rather than `node:crypto`: this project ships no @types/node,
+    // so the import does not typecheck, and `globalThis.crypto` works in both the
+    // Node and Edge runtimes.
     const assigned_dbt = `user-${globalThis.crypto.randomUUID()}`;
     // 8 symbols over 31 = ~39.6 bits: roughly 1.0M signups to a 50% chance of
     // any collision, against 301 before. Still short enough to read aloud.
     const referral_code = `TR-${randomCode(8)}`;
 
-    const { error } = await supabase
+    // Lazy client from #1 — constructing at module scope ran at BUILD time and
+    // took this route down with `supabaseUrl is required`. `data` is not
+    // destructured because nothing here reads it; the response is built from the
+    // values we generated.
+    const { error } = await getSupabaseAdmin()
       .from('community_waitlist')
       .insert([
         {
