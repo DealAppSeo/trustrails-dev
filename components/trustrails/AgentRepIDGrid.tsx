@@ -4,20 +4,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const _supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const _supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!_supabaseUrl) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL in Vercel Environment');
-}
-if (!_supabaseKey) {
-  throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY or ANON_KEY in Vercel Environment');
-}
-
-
-const supabase = createClient(_supabaseUrl, _supabaseKey);
+import { getSupabaseBrowser } from '@/lib/supabase-browser';
 
 const TIER_COLORS: Record<string, string> = {
   Platinum: '#e2e8f0',
@@ -31,8 +18,7 @@ export function AgentRepIDGrid() {
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase
-        .from('agent_kya_registry')
+      const { data } = await getSupabaseBrowser().from('agent_kya_registry')
         .select(`
           agent_name,
           repid_score,
@@ -56,13 +42,12 @@ export function AgentRepIDGrid() {
     };
     load();
 
-    const sub = supabase
-      .channel('public:agent_kya_registry')
+    const sub = getSupabaseBrowser().channel('public:agent_kya_registry')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'agent_kya_registry' }, () => {
         load();
       })
       .subscribe();
-    return () => { supabase.removeChannel(sub); };
+    return () => { getSupabaseBrowser().removeChannel(sub); };
   }, []);
 
   return (

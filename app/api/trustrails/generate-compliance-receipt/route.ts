@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import crypto from 'crypto';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function POST(req: Request) {
   try {
@@ -16,8 +12,7 @@ export async function POST(req: Request) {
     }
 
     // 1. Fetch SBT holder's institution
-    const { data: sbt, error: sbtError } = await supabase
-      .from('human_sbt_registry')
+    const { data: sbt, error: sbtError } = await getSupabaseAdmin().from('human_sbt_registry')
       .select('institution_id')
       .eq('token_id', sbt_token_id)
       .maybeSingle();
@@ -28,8 +23,7 @@ export async function POST(req: Request) {
     const instId = sbt.institution_id || 'default';
 
     // 2. Fetch institution and check dual_signature_policy
-    const { data: config } = await supabase
-      .from('institution_config')
+    const { data: config } = await getSupabaseAdmin().from('institution_config')
       .select('settings')
       .eq('id', instId)
       .maybeSingle();
@@ -42,8 +36,7 @@ export async function POST(req: Request) {
     }
 
     // fallback to global policies
-    const { data: policies } = await supabase
-      .from('dual_signature_policy')
+    const { data: policies } = await getSupabaseAdmin().from('dual_signature_policy')
       .select('*')
       .eq('institution_id', instId)
       .eq('active', true);
@@ -58,8 +51,7 @@ export async function POST(req: Request) {
     const payloadToHash = `${sbt_token_id}:${agent_id}:${transaction_type}:${amount_usdc}`;
     const receipt_hash = crypto.createHash('sha256').update(payloadToHash).digest('hex');
 
-    const { error: insertError } = await supabase
-      .from('kya_compliance_receipts')
+    const { error: insertError } = await getSupabaseAdmin().from('kya_compliance_receipts')
       .insert({
         receipt_id,
         token_id: sbt_token_id,
@@ -73,7 +65,7 @@ export async function POST(req: Request) {
     if (insertError) throw insertError;
 
     // 4. Call create_trust_event
-    await supabase.rpc('create_trust_event', {
+    await getSupabaseAdmin().rpc('create_trust_event', {
       p_event_type: 'compliance_receipt',
       p_subject_id: sbt_token_id,
       p_institution_id: instId,

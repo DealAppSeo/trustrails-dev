@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import crypto from 'crypto';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function POST(req: Request) {
   try {
@@ -16,8 +12,7 @@ export async function POST(req: Request) {
     }
 
     // Check if wallet already has active DBT or SBT
-    const { data: existingDbt } = await supabase
-      .from('dbt_registry')
+    const { data: existingDbt } = await getSupabaseAdmin().from('dbt_registry')
       .select('id, status')
       .eq('wallet_address', wallet_address)
       .in('status', ['verifying', 'active'])
@@ -27,8 +22,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Wallet already has an active DBT', token_id: existingDbt.id }, { status: 400 });
     }
 
-    const { data: existingSbt } = await supabase
-      .from('human_sbt_registry')
+    const { data: existingSbt } = await getSupabaseAdmin().from('human_sbt_registry')
       .select('id')
       .eq('wallet_address', wallet_address)
       .maybeSingle();
@@ -43,8 +37,7 @@ export async function POST(req: Request) {
     const instId = institution_id || 'default';
 
     // 2. INSERT into dbt_registry
-    const { error: dbtError } = await supabase
-      .from('dbt_registry')
+    const { error: dbtError } = await getSupabaseAdmin().from('dbt_registry')
       .insert({
         token_id,
         wallet_address,
@@ -65,8 +58,7 @@ export async function POST(req: Request) {
 
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
-    const { error: otpError } = await supabase
-      .from('pol_otp_sessions')
+    const { error: otpError } = await getSupabaseAdmin().from('pol_otp_sessions')
       .insert([
         { dbt_token_id: token_id, otp_type: 'email', otp_hash: emailHash, expires_at: expiresAt, verified: false },
         { dbt_token_id: token_id, otp_type: 'sms', otp_hash: smsHash, expires_at: expiresAt, verified: false }
@@ -80,7 +72,7 @@ export async function POST(req: Request) {
     console.log(`SMS OTP: ${smsOtp}`);
 
     // 6. Call create_trust_event (assuming the DB function accepts these parameters)
-    const { error: eventError } = await supabase.rpc('create_trust_event', {
+    const { error: eventError } = await getSupabaseAdmin().rpc('create_trust_event', {
       p_event_type: 'dbt_created',
       p_subject_id: token_id,
       p_institution_id: instId,

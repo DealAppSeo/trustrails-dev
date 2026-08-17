@@ -1,9 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 export async function GET(request: NextRequest, { params }: { params: { wallet: string } }) {
   try {
@@ -13,8 +9,7 @@ export async function GET(request: NextRequest, { params }: { params: { wallet: 
       return NextResponse.json({ error: 'Wallet parameter missing' }, { status: 400 });
     }
 
-    const { data: sbt, error } = await supabase
-      .from('human_sbt_registry')
+    const { data: sbt, error } = await getSupabaseAdmin().from('human_sbt_registry')
       .select('*')
       .eq('wallet_address', wallet)
       .maybeSingle();

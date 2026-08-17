@@ -1,11 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-browser';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
 import { SystemTrustScore } from '@/components/trustrails/SystemTrustScore';
 import { AgentRepIDGrid }   from '@/components/trustrails/AgentRepIDGrid';
 import { LiveReceiptFeed }  from '@/components/trustrails/LiveReceiptFeed';
@@ -20,14 +17,16 @@ interface DashData {
 export default function Dashboard() {
   const [sophiaLiveRepId, setSophiaLiveRepId] = useState('8,590');
   useEffect(() => {
-    if(supabaseUrl) {
-      supabase.from('agent_repid').select('repid_score').eq('agent_name', 'trinity-sophia').single()
-        .then(({data}) => {
-          if (data && data.repid_score) {
-            setSophiaLiveRepId(Math.round(data.repid_score * 100).toLocaleString());
-          }
-        });
-    }
+    // The `if (supabaseUrl)` guard that stood here read a module-scope constant
+    // that no longer exists. getSupabaseBrowser() throws and names the missing
+    // variable, so the configuration check lives in one place instead of being
+    // restated — and silently skipped — at each call site.
+    getSupabaseBrowser().from('agent_repid').select('repid_score').eq('agent_name', 'trinity-sophia').single()
+      .then(({ data }) => {
+        if (data && data.repid_score) {
+          setSophiaLiveRepId(Math.round(data.repid_score * 100).toLocaleString());
+        }
+      });
   }, []);
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -76,29 +75,24 @@ export default function Dashboard() {
     async function fetchRealStats() {
       try {
         const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-        const { count: active } = await supabase
-          .from('agent_heartbeat')
+        const { count: active } = await getSupabaseBrowser().from('agent_heartbeat')
           .select('*', { count: 'exact', head: true })
           .gt('last_ping', fiveMinsAgo);
 
-        const { data: latestBft } = await supabase
-          .from('agent_heartbeat')
+        const { data: latestBft } = await getSupabaseBrowser().from('agent_heartbeat')
           .select('last_ping')
           .order('last_ping', { ascending: false })
           .limit(1)
           .single();
 
-        const { count: tasksDone } = await supabase
-          .from('trinity_tasks')
+        const { count: tasksDone } = await getSupabaseBrowser().from('trinity_tasks')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'complete');
 
-        const { count: totalLogs } = await supabase
-          .from('trinity_hallucination_logs')
+        const { count: totalLogs } = await getSupabaseBrowser().from('trinity_hallucination_logs')
           .select('*', { count: 'exact', head: true });
           
-        const { count: vetoedLogs } = await supabase
-          .from('trinity_hallucination_logs')
+        const { count: vetoedLogs } = await getSupabaseBrowser().from('trinity_hallucination_logs')
           .select('*', { count: 'exact', head: true })
           .not('veto_reason', 'is', null);
 
@@ -789,7 +783,6 @@ export default function Dashboard() {
             </div>
           </div>
         )}
-
 
         {/* HOW ACCOUNTABILITY WORKS PANEL */}
         <div style={{
