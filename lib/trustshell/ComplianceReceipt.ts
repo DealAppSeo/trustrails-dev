@@ -5,6 +5,30 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 import type { ComplianceReceipt, KYAComplianceResult, BFTConsensusProof } from './types';
 
+/**
+ * The HMAC key behind `auditHash`. There is NO fallback: the old default
+ * ('trinity-default-sbt-secret') was in this public repo, so anyone could mint
+ * an auditHash that "verified". A receipt we cannot sign with a private key is
+ * not a receipt, so a missing secret fails loudly instead.
+ */
+export function requireReceiptHmacSecret(): string {
+  const secret = process.env.TRUSTRAILS_HMAC_SECRET;
+  if (!secret) {
+    throw new Error('TRUSTRAILS_HMAC_SECRET is not set: refusing to issue an unsigned compliance receipt.');
+  }
+  return secret;
+}
+
+/**
+ * What this receipt does NOT prove. No Fireblocks pre-authorization is performed
+ * (no credentials, no API call), and the BFT "vote" is a local rule simulation
+ * in BFTAuthorizer, not a multi-party vote.
+ */
+export const RECEIPT_SIMULATED_PARTS = [
+  'fireblocks_preauth: not performed (no Fireblocks call; id is null)',
+  'bft_consensus: local rule simulation in BFTAuthorizer, not a multi-party vote',
+];
+
 export class ComplianceReceiptGenerator {
   private get supabase() { return getSupabaseAdmin(); }
 
@@ -17,9 +41,10 @@ export class ComplianceReceiptGenerator {
     solanaExplorerUrl: string;
     ruleHash:        string;
   }): Promise<ComplianceReceipt> {
+    // Before anything else: no secret, no receipt, no DB write.
+    const secret = requireReceiptHmacSecret();
 
     const receiptId = crypto.randomUUID();
-    const fireblocksPreAuthId = `FB-PREAUTH-${receiptId.slice(0, 8).toUpperCase()}`;
 
     // Build audit hash — tamper-evident proof of entire receipt
     const auditData = [
@@ -34,10 +59,12 @@ export class ComplianceReceiptGenerator {
       params.ruleHash,
     ].join(':');
 
-    const auditHash = await this.sha256(auditData);
+    const auditHash = await this.hmacSha256(auditData, secret);
 
     const receipt: ComplianceReceipt = {
       receiptId,
+      label:              'SIMULATED',
+      simulated:          RECEIPT_SIMULATED_PARTS,
       agentName:          params.kyaResult.agentName,
       agentRepidScore:    params.kyaResult.repidScore,
       agentRepidTier:     params.kyaResult.repidTier,
@@ -53,7 +80,8 @@ export class ComplianceReceiptGenerator {
       insuranceCoverage:  params.kyaResult.insuranceCoverage,
       solanaExplorerUrl:  params.solanaExplorerUrl,
       solanaTxHash:       params.solanaTxHash,
-      fireblocksPreAuthId,
+      // No Fireblocks pre-authorization happens, so there is no id to report.
+      fireblocksPreAuthId: null,
       auditHash,
       createdAt:          new Date().toISOString(),
     };
@@ -65,12 +93,12 @@ export class ComplianceReceiptGenerator {
       .eq('agent_name', params.kyaResult.agentName)
       .single();
 
-    const custodian_context = agentData.data?.custodian_link_active 
+    const custodian_context = agentData.data?.custodian_link_active
       ? `Custodian verified (${agentData.data?.custodian_tier}) — ZKP protected`
       : 'DBT-only — agent liability only';
 
     // Persist to Supabase
-    await this.supabase.from('kya_compliance_receipts').insert({
+    const { error } = await this.supabase.from('kya_compliance_receipts').insert({
       receipt_id:           receipt.receiptId,
       agent_name:           receipt.agentName,
       agent_repid_score:    receipt.agentRepidScore,
@@ -97,12 +125,20 @@ export class ComplianceReceiptGenerator {
       custodian_context:    custodian_context,
     });
 
+    // An unpersisted receipt must not be returned as if it existed. The tx hash
+    // goes in the message: the Solana transfer already ran, so it must not be lost.
+    if (error) {
+      throw new Error(
+        `kya_compliance_receipts insert failed for receipt ${receipt.receiptId} ` +
+          `(solana tx ${params.solanaTxHash}): ${error.message}`
+      );
+    }
+
     return receipt;
   }
 
-  private async sha256(data: string): Promise<string> {
+  private async hmacSha256(data: string, secret: string): Promise<string> {
     const crypto = await import('crypto');
-    const secret = process.env.TRUSTRAILS_HMAC_SECRET || 'trinity-default-sbt-secret';
     return crypto.createHmac('sha256', secret).update(data).digest('hex');
   }
 }

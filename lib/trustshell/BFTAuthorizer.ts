@@ -74,6 +74,8 @@ export class BFTAuthorizer {
       passed,
       pythagoreanVeto: vetoFired,
       votedAt:        new Date().toISOString(),
+      // Fixed local rules (+ a 5% random veto), computed in this process. Not a multi-party vote.
+      label:          'SIMULATED',
     };
 
     await this.supabase.from('trinity_agent_logs').insert({
