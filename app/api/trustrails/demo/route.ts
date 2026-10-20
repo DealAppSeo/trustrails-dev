@@ -62,7 +62,8 @@ export async function POST(req: NextRequest) {
     fireblocksRef:  payment.receipt?.fireblocksPreAuthId,
     insuranceCoverage: payment.receipt?.insuranceCoverage,
     liabilityModel: 'SBT (Soulbound Token) Human Custody',
-    message:        'SOPHIA earned Gold tier and holds an active SBT binding verified human liability. BFT consensus passed. Fireblocks pre-authorized.',
+    receiptLabel:   payment.receipt?.label,
+    message:        'SOPHIA earned Gold tier and holds an active SBT binding verified human liability. SIMULATED: the BFT consensus is a local rule simulation and no Fireblocks pre-authorization was performed.',
   });
 
   // ── BEAT 3: THE VAULT (Track 1) ─────────────────────────────────────────

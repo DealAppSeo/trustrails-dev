@@ -3,6 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { requireReceiptHmacSecret } from '@/lib/trustshell/ComplianceReceipt';
 import {
   KYAValidator, BFTAuthorizer, ComplianceReceiptGenerator,
   SolanaExecutor,
@@ -20,6 +21,10 @@ export async function POST(req: NextRequest) {
   const calc       = new RepIDCalculator();
 
   try {
+    // Refuse BEFORE any money moves: without the HMAC secret no receipt can be
+    // issued, and a transfer with no receipt is worse than no transfer.
+    requireReceiptHmacSecret();
+
     // Step 1: KYA Validation
     const kyaResult = await kya.validate(agentName, amountUSDC);
     if (!kyaResult.kya_verified) {

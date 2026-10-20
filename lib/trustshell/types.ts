@@ -32,6 +32,8 @@ export interface BFTConsensusProof {
   passed:            boolean;
   pythagoreanVeto:   boolean;
   votedAt:           string;
+  /** BFTAuthorizer computes these votes locally from fixed rules; no other party voted. */
+  label:             'SIMULATED';
 }
 
 export interface KYAComplianceResult {
@@ -49,6 +51,9 @@ export interface KYAComplianceResult {
 
 export interface ComplianceReceipt {
   receiptId:          string;
+  /** Parts of this receipt are simulated; `simulated` names them. */
+  label:              'SIMULATED';
+  simulated:          string[];
   agentName:          string;
   agentRepidScore:    number;
   agentRepidTier:     RepIDTier;
@@ -64,7 +69,8 @@ export interface ComplianceReceipt {
   insuranceCoverage:  number;
   solanaExplorerUrl:  string;
   solanaTxHash:       string;
-  fireblocksPreAuthId: string;
+  /** Always null: no Fireblocks pre-authorization is performed. */
+  fireblocksPreAuthId: string | null;
   auditHash:          string;
   createdAt:          string;
 }
