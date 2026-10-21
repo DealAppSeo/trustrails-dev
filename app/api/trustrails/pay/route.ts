@@ -11,6 +11,16 @@ import {
 } from '@/lib/trustshell';
 
 export async function POST(req: NextRequest) {
+  // CONTAINMENT: nothing below authenticates the caller, yet it signs a transfer with an agent
+  // key and raises RepID. Off unless TRUSTRAILS_PAY_ENABLED is exactly "true", refused before
+  // the body is read. Turn it on only once real caller authorization exists.
+  if (process.env.TRUSTRAILS_PAY_ENABLED !== 'true') {
+    return NextResponse.json(
+      { approved: false, stage: 'disabled', reason: 'Payments are disabled on this deployment.' },
+      { status: 503 },
+    );
+  }
+
   const { agentName, amountUSDC, recipientAddress, purpose, signatures } = await req.json();
 
   const kya        = new KYAValidator();
