@@ -16,14 +16,6 @@ export default function Home() {
 
         <div className="flex flex-col md:flex-row justify-center gap-10 md:gap-16 mb-16">
           <div className="flex flex-col items-center">
-            <span className="text-[36px] text-[#22c55e] font-mono">0%</span>
-            <span className="text-[11px] text-[#475569] uppercase font-mono mt-2">MAX DRAWDOWN</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-[36px] text-[#22c55e] font-mono">49.63%</span>
-            <span className="text-[11px] text-[#475569] uppercase font-mono mt-2">WITHOUT VETO</span>
-          </div>
-          <div className="flex flex-col items-center">
             <span className="text-[36px] text-[#22c55e] font-mono">531441/524288</span>
             <span className="text-[11px] text-[#475569] uppercase font-mono mt-2">PYTHAGOREAN COMMA</span>
           </div>
@@ -32,8 +24,8 @@ export default function Home() {
         <div className="bg-[#1c1407] border border-[#78350f] rounded p-6 w-full max-w-[480px] mx-auto mb-16 shadow-lg shadow-amber-900/10">
           <h2 className="text-[24px] font-bold text-[#f59e0b] mb-4">BEAT OUR AGENT</h2>
           <p className="text-[14px] text-[#94a3b8] mb-4">
-            SOPHIA has issued 4 constitutional refusals.<br/>
-            Drawdown: 0%. Can you beat her?
+            SOPHIA is our paper-trading agent.<br/>
+            Can you beat her?
           </p>
           <p className="text-[14px] text-[#f8fafc] mb-6 font-semibold">
             Beat SOPHIA's 30-day P&L → Win Full tier<br/>

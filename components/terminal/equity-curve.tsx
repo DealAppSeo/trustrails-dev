@@ -10,7 +10,7 @@ const DATA = [
   { day: "Day 15", safe: 10100, unvetoed: 9200, unity: 0.76 },
   { day: "Day 20", safe: 10000, unvetoed: 8500, unity: 0.65 },
   { day: "Day 25", safe: 10080, unvetoed: 8800, unity: 0.82 },
-  { day: "Day 30", safe: 10000, unvetoed: 9048.82, unity: 0.94 },
+  { day: "Day 30", safe: 10000, unvetoed: 9050, unity: 0.94 },
 ];
 
 export function EquityCurve() {
@@ -20,16 +20,16 @@ export function EquityCurve() {
     <div className="flex flex-col p-4 w-full" style={{ background: "#0a0f1e", borderTop: "1px solid #1e293b" }}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-mono uppercase text-[#475569] text-[10px] tracking-widest">
-          {displayMode === "simple" ? "Performance Impact" : "Simulation: Constitutional Veto Delta"}
+          Illustration only: invented numbers, not a backtest
         </h3>
         <div className="flex gap-4">
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-[#22c55e]"></span>
-            <span className="text-[#f8fafc] text-[10px] font-mono">With Veto (0% DD)</span>
+            <span className="text-[#f8fafc] text-[10px] font-mono">With veto</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-[#ef4444]"></span>
-            <span className="text-[#f8fafc] text-[10px] font-mono">Without Veto (49.6% DD)</span>
+            <span className="text-[#f8fafc] text-[10px] font-mono">Without veto</span>
           </div>
         </div>
       </div>
@@ -59,11 +59,6 @@ export function EquityCurve() {
             )}
           </AreaChart>
         </ResponsiveContainer>
-      </div>
-      
-      <div className="mt-2 text-[10px] text-[#475569] font-mono flex justify-between">
-        <span>$10,000 preserved</span>
-        <span>$9,048.82 remaining</span>
       </div>
     </div>
   );
