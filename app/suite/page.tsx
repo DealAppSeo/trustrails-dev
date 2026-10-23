@@ -159,7 +159,7 @@ export default function SuiteHome() {
               <span style={{ fontSize: '11px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', padding: '4px 8px', borderRadius: '4px', border: '1px solid rgba(245, 158, 11, 0.2)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>LabLab Hackathon · $55K</span>
             </h3>
             <p style={{ fontSize: '15px', color: '#94a3b8', lineHeight: '1.6', margin: '0 0 24px 0', flex: 1 }}>
-              <strong style={{ color: '#f1f5f9' }}>Hallucination-Free Trading · Patent Pending</strong> · Constitutional AI that proves what it refuses to trade. 13 signals. Pythagorean Comma veto. 0% drawdown vs 49.63% without.
+              <strong style={{ color: '#f1f5f9' }}>Hallucination-Free Trading · Patent Pending</strong> · Constitutional AI that proves what it refuses to trade. 13 signals. Pythagorean Comma veto.
             </p>
             <a href="https://trusttrader.dev/trade" style={{ display: 'inline-block', color: '#10b981', fontWeight: 'bold', textDecoration: 'none' }}>
               Enter Terminal →
