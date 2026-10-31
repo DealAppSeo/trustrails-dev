@@ -59,7 +59,7 @@ export function SystemTrustScore() {
         System Trust Score / 10,000
       </div>
       <div style={{ fontSize: 14, color: '#8b9ab0', marginTop: 8 }}>
-        BFT Threshold: 66.7% supermajority &middot; 3 LLM providers &middot; Pythagorean Comma Veto active
+        BFT Threshold: 66.7% supermajority &middot; simulated local rules, not independent LLMs &middot; Pythagorean Comma Veto (random in simulation)
       </div>
 
       {/* Status badge */}
@@ -94,7 +94,7 @@ export function SystemTrustScore() {
         color: '#94a3b8',
         border: '1px solid #334155'
       }}>
-        <div><strong>Verified Human Custodians:</strong> <span style={{ color: '#e2e8f0' }}>{data.totalHumanCustodians || 0}</span></div>
+        <div><strong>Registered Human Custodians:</strong> <span style={{ color: '#e2e8f0' }}>{data.totalHumanCustodians || 0}</span></div>
         <div><strong>Active Custodianships:</strong> <span style={{ color: '#e2e8f0' }}>{data.totalActiveCustodianships || 0}</span></div>
         <div><strong>Agents Earned Autonomy:</strong> <span style={{ color: '#e2e8f0' }}>{data.totalAgentsGraduated || 0}</span></div>
       </div>
@@ -106,7 +106,7 @@ export function SystemTrustScore() {
           { label: 'Human Custody',     value: `${data.humanCustodyVerified}/${data.agentCount}` },
           { label: 'Insurance Pool',    value: `$${(data.totalInsuranceCoverage/1000).toFixed(0)}K` },
           { label: '24h Volume',        value: `$${(data.last24Hours?.volumeUSDC/1000 || 0).toFixed(1)}K` },
-          { label: 'Compliance Rate',   value: data.last24Hours?.complianceRate || '100%' },
+          { label: 'Compliance Rate',   value: data.last24Hours?.complianceRate ?? 'not measured' },
           { label: 'Attempts Blocked',  value: data.last24Hours?.attemptsBocked || 0 },
         ].map(m => (
           <div key={m.label} style={{ textAlign: 'center', minWidth: 80 }}>
@@ -119,18 +119,21 @@ export function SystemTrustScore() {
       {/* Regulatory readiness */}
       {data.regulatoryStatus && (
         <div style={{ display: 'flex', gap: 8, marginTop: 20, justifyContent: 'center', flexWrap: 'wrap' }}>
-          {Object.entries(data.regulatoryStatus).map(([key, val]) => (
-            <span key={key} style={{
-              background: val ? '#14532d' : '#450a0a',
-              color: val ? '#86efac' : '#fca5a5',
-              borderRadius: 6,
-              padding: '3px 10px',
-              fontSize: 13,
-              fontWeight: 600,
-            }}>
-              {val ? '✓' : '✗'} {key.replace(/([A-Z])/g, ' $1').trim()}
-            </span>
-          ))}
+          {Object.entries(data.regulatoryStatus).map(([key, val]) => {
+            const notChecked = val === 'NOT_CHECKED';
+            return (
+              <span key={key} style={{
+                background: notChecked ? '#1e293b' : val ? '#14532d' : '#450a0a',
+                color: notChecked ? '#94a3b8' : val ? '#86efac' : '#fca5a5',
+                borderRadius: 6,
+                padding: '3px 10px',
+                fontSize: 13,
+                fontWeight: 600,
+              }}>
+                {notChecked ? '' : val ? '✓ ' : '✗ '}{key.replace(/([A-Z])/g, ' $1').trim()}{notChecked ? ': not checked' : ''}
+              </span>
+            );
+          })}
         </div>
       )}
 

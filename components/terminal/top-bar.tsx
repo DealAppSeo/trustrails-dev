@@ -50,7 +50,7 @@ export function TopBar() {
               Blockchain record
             </span>
             <span className="font-mono hidden md:inline-block" style={{ fontSize: 11, color: "#64748b" }}>
-              On-chain verified
+              No on-chain record read
             </span>
           </>
         )}

@@ -78,14 +78,14 @@ export async function GET(request: Request, { params }: { params: { id: string }
       agent_id: agentId,
       credential_type: "DBT",
       repid_band: band,
-      validation_count: def.validation_count,
-      conservator_present: true,
+      validation_count: realData?.validation_count ?? null,
+      conservator_present: realData?.conservator_present ?? null,
       transferable: true,
-      last_attestation: def.last_val,
+      last_attestation: realData?.last_attestation ?? null,
       agent_card_uri: `https://trusttrader.dev/agents/${agentId}/.well-known/agent-card.json`,
       created_at: realData?.created_at || def.created_at,
       erc8004_token_id: realData?.erc8004_token_id || def.token_id,
-      basescan_link: `https://sepolia.basescan.org/token/0x3fA4000000000000000000c81B?a=${realData?.erc8004_token_id || def.token_id}`
+      basescan_link: realData?.basescan_link ?? null
     },
     tier2_packet: {
       agent_name: agentId.toUpperCase(),
@@ -94,7 +94,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
       total_decisions: def.total_decisions,
       refused_percentage: def.refused_pct,
       conservator_tier: "peer_back",
-      zkp_proof_hash: "0xab12" + Math.random().toString(16).substring(2, 8) + "f790",
       mcp_endpoint: `https://trusttrader.dev/mcp/${agentId}`,
       sector: "trading",
       constitutional_architecture: "Pythagorean Comma BFT Veto — threshold 531441/524288"

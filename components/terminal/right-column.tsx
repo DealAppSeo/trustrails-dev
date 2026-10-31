@@ -152,12 +152,8 @@ export function RightColumn() {
           style={{ fontSize: 10, color: "#334155" }}
         >
           <div>
-            <span style={{ color: "#475569" }}>{displayMode === "simple" ? "Verified:" : "ERC-8004:"} </span>
-            0x3fA4...c81B
-          </div>
-          <div>
-            <span style={{ color: "#475569" }}>{displayMode === "simple" ? "Hash:" : "Merkle root:"} </span>
-            0xab12...f790
+            <span style={{ color: "#475569" }}>{displayMode === "simple" ? "Credential:" : "ERC-8004:"} </span>
+            No on-chain record read
           </div>
           {decisions.length > 0 && decisions[0].tx_hash && displayMode === "advanced" && (
             <div>

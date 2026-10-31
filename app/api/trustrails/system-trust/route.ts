@@ -7,7 +7,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin';
 export async function GET() {
   // Pull all 12 agent RepID scores
   const { data: agents } = await getSupabaseAdmin().from('agent_kya_registry')
-    .select('agent_name, repid_score, repid_tier, insurance_coverage, human_custody_verified');
+    .select('*');  // '*' so kya_verified (if the column exists) is visible to the tagline check
 
   if (!agents || agents.length === 0) {
     return NextResponse.json({ systemTrustScore: 0, status: 'no_agents' });
@@ -31,16 +31,16 @@ export async function GET() {
   const totalTxns24h     = (receipts || []).filter(r => r.bft_passed).length;
   const blockedTxns24h   = (receipts || []).filter(r => !r.bft_passed).length;
 
-  // System status
+  // Level of the AVERAGE RepID. A level label, not a verification claim.
   const status =
-    systemScore >= 8000 ? 'TRUSTED'    :
-    systemScore >= 6000 ? 'VERIFIED'   :
-    systemScore >= 4000 ? 'MONITORING' : 'RESTRICTED';
+    systemScore >= 8000 ? 'LEVEL_HIGH' :
+    systemScore >= 6000 ? 'LEVEL_MID'  :
+    systemScore >= 4000 ? 'LEVEL_LOW'  : 'LEVEL_MINIMAL';
 
   const statusColor =
-    status === 'TRUSTED'    ? '#22c55e' :  // green
-    status === 'VERIFIED'   ? '#3b82f6' :  // blue
-    status === 'MONITORING' ? '#f59e0b' :  // amber
+    status === 'LEVEL_HIGH' ? '#22c55e' :  // green
+    status === 'LEVEL_MID'  ? '#3b82f6' :  // blue
+    status === 'LEVEL_LOW'  ? '#f59e0b' :  // amber
     '#ef4444';                             // red
 
   const { data: humanSbts } = await getSupabaseAdmin().from('human_sbt_registry')
@@ -60,9 +60,9 @@ export async function GET() {
     systemTrustPct:    (systemScore / 100).toFixed(1) + '%',
     status,
     statusColor,
-    tagline:           status === 'TRUSTED'
+    tagline:           agents.every(a => a.kya_verified === true)
       ? 'All agents KYA-verified and operating within earned limits'
-      : 'System monitoring active — some agents below institutional threshold',
+      : 'Average RepID level shown; per-agent KYA verification not confirmed for every agent',
     agentCount:        agents.length,
     tierDistribution:  tiers,
     humanCustodyVerified: agents.filter(a => a.human_custody_verified).length,
@@ -76,14 +76,14 @@ export async function GET() {
       attemptsBocked:   blockedTxns24h,
       complianceRate:   totalTxns24h + blockedTxns24h > 0
         ? ((totalTxns24h / (totalTxns24h + blockedTxns24h)) * 100).toFixed(1) + '%'
-        : '100%',
+        : null,   // no attempts in 24h = not measured (rendered "not measured")
     },
-    // Regulatory readiness
+    // Regulatory readiness. None of these four is checked anywhere in this codebase.
     regulatoryStatus: {
-      micaCompliant:    true,
-      geniusActReady:   true,
-      fatfAligned:      true,
-      fireblocksPreAuth: true,
+      micaCompliant:    'NOT_CHECKED',
+      geniusActReady:   'NOT_CHECKED',
+      fatfAligned:      'NOT_CHECKED',
+      fireblocksPreAuth: 'NOT_CHECKED',
       aminaPilotReady:  systemScore >= 7500,
     },
   });

@@ -100,7 +100,7 @@ export default function Dashboard() {
           agentsOnline: active || 0,
           lastBft: latestBft?.last_ping ? new Date(latestBft.last_ping).toLocaleTimeString() : '',
           hallucinationRate: totalLogs && totalLogs > 0 ? `${(((vetoedLogs || 0) / totalLogs) * 100).toFixed(1)}%` : '',
-          caught: totalLogs || 298,
+          caught: totalLogs || 0,
           costSaved: ((tasksDone || 0) * 0.0047).toFixed(2),
           loaded: true
         });
@@ -136,9 +136,9 @@ export default function Dashboard() {
 
   const getHash = (idx: number) => {
     if (data && data.receipts && data.receipts[idx]) {
-      return data.receipts[idx].solana_tx_hash;
+      return data.receipts[idx].solana_tx_hash || '';
     }
-    return '3sFtj7Xty9sUgFso5PhNWi57FuNgjfYBo72Vggnr67m8U33t5KZHNd3hsgQCdq4mT6TyKEzogQPanRfDmsHg1aXo';
+    return '';
   };
 
   const getAgent = (name: string, fallbackRep: string, fallbackTier: string) => {
@@ -151,6 +151,15 @@ export default function Dashboard() {
     if (!hash) return '';
     return hash.substring(0, 16) + '...' + hash.substring(hash.length - 4);
   };
+
+  // A missing hash shows "no tx", never a made-up one.
+  const txLink = (hash: string, href?: string) => hash
+    ? <a href={href || `https://explorer.solana.com/tx/${hash}?cluster=devnet`} target="_blank" rel="noopener" style={{color: '#60a5fa'}} title={hash}>{truncate(hash)}</a>
+    : 'no tx';
+
+  const illustrative = (
+    <div style={{ fontSize: '12px', color: '#94a3b8', fontStyle: 'italic' }}>Illustrative scenario: scripted example, not live data</div>
+  );
 
   const profileConfig = {
     conservative: { singleLimit: 10000, dualLimit: 10000, bft: 66.7, dailyCap: 500000, name: 'Conservative (MiCA/AMINA)' },
@@ -292,7 +301,7 @@ export default function Dashboard() {
           <div style={{ display: 'flex', gap: '16px' }}>
             <div style={{ background: '#1e0f0f', border: '1px solid #7f1d1d', padding: '16px', borderRadius: '8px', minWidth: '160px' }}>
               <div style={{ fontSize: '13px', color: '#fca5a5', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 700 }}>Hallucinations</div>
-              <div style={{ fontSize: '24px', fontWeight: 900, color: '#ef4444' }}>{realStats.caught || 298} CAUGHT</div>
+              <div style={{ fontSize: '24px', fontWeight: 900, color: '#ef4444' }}>{realStats.caught ? `${realStats.caught} CAUGHT` : 'not measured'}</div>
             </div>
             <div style={{ background: '#0a1f12', border: '1px solid #14532d', padding: '16px', borderRadius: '8px', minWidth: '160px' }}>
               <div style={{ fontSize: '13px', color: '#86efac', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 700 }}>Cost Saved</div>
@@ -399,6 +408,7 @@ export default function Dashboard() {
 
             {demoStateL === 2 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {illustrative}
                 
                 {/* SCENARIO A */}
                 <div style={{ background: '#1e293b', borderRadius: '8px', padding: '16px' }}>
@@ -535,7 +545,7 @@ export default function Dashboard() {
                         <Bar label="Gemini" score={0.29} target="70%" />
                         <br/>
                         Custodian liability: Qualified Investor (ZKP-verified)<br/>
-                        Solana Tx: <a href={`https://explorer.solana.com/tx/${getHash(0)}?cluster=devnet`} target="_blank" rel="noopener" style={{color: '#60a5fa'}} title={getHash(0)}>{truncate(getHash(0))}</a>
+                        Solana Tx: {txLink(getHash(0))}
                       </div>
                       <div style={{ fontSize: '14px', color: '#86efac', fontStyle: 'italic' }}>
                         Immutable. Verifiable. On-chain. 340ms.
@@ -587,6 +597,7 @@ export default function Dashboard() {
 
             {demoStateR === 3 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {illustrative}
                 <div style={{ background: '#1e293b', borderRadius: '8px', padding: '16px' }}>
                   {!revealRA ? (
                     <div style={{ fontFamily: 'monospace', color: '#94a3b8' }}>
@@ -623,6 +634,7 @@ export default function Dashboard() {
             
             {demoStateR === 2 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {illustrative}
                 
                 {/* SCENARIO D */}
                 <div style={{ background: '#1e293b', borderRadius: '8px', padding: '16px' }}>
@@ -648,7 +660,7 @@ export default function Dashboard() {
                         Combined: 94% — Passes 66.7% threshold<br/><br/>
                         Custodian liability: Qualified Investor (ZKP-verified)<br/>
                         Human identity: Proven, not revealed.<br/>
-                        Solana Tx: <a href={liveExplorerUrl || `https://explorer.solana.com/tx/${getHash(1)}?cluster=devnet`} target="_blank" rel="noopener" style={{color: '#60a5fa'}} title={liveTxHash || getHash(1)}>{truncate(liveTxHash || getHash(1))}</a><br/>
+                        Solana Tx: {txLink(liveTxHash || getHash(1), liveExplorerUrl)}<br/>
                         Memo field: compliance_hash + RepID + BFT weight<br/>
                         Regulators can verify independently — without us.<br/>
                         ZKP Proof: zk_proof_bafybeig...<br/>
@@ -712,7 +724,7 @@ export default function Dashboard() {
                       </div>
                       <div style={{ fontSize: '14px', background: '#000', padding: '12px', borderRadius: '4px', fontFamily: 'monospace', color: '#cbd5e1', marginBottom: '12px' }}>
                         Amount is below Single-Sig limit of ${profileConfig.singleLimit.toLocaleString()}.<br/>
-                        Solana Tx: <a href={`https://explorer.solana.com/tx/${getHash(2)}?cluster=devnet`} target="_blank" rel="noopener" style={{color: '#60a5fa'}} title={getHash(2)}>{truncate(getHash(2))}</a>
+                        Solana Tx: {txLink(getHash(2))}
                       </div>
                     </div>
                   ) : (

@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
       approved:     true,
       receipt,
       explorerUrl,
-      message: `KYA-verified payment of ${amountUSDC} USDC executed by ${agentName} (RepID: ${kyaResult.repidScore})`,
+      message: 'Devnet SOL transfer submitted (unconfirmed; fixed 1,000,000 lamports). No USDC moved; the amount shown is the requested amount.',
     });
 
   } catch (error: any) {

@@ -87,7 +87,7 @@ export function AgentRepIDGrid() {
                   )}
                   {agent.lifecycle_state === 'CUSTODIED_DBT' && (
                     <span 
-                      title="Human custodian verified via Zero-Knowledge Proof. Identity proven, never revealed. Satisfies MiCA UBO requirement without exposing identity."
+                      title="Human custodian recorded; ZKP not checked."
                       style={{ background: '#1e3a5f', color: '#60a5fa', fontSize: '13px', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace', marginLeft: '4px' }}
                     >⛓ SPONSORED</span>
                   )}
@@ -152,8 +152,8 @@ export function AgentRepIDGrid() {
                 </div>
                 <div>
                   <strong>Custodian:</strong>{' '}
-                  {agent.lifecycle_state === 'EARNING_AUTONOMY' ? 'Qualified Investor · ZKP verified' :
-                   agent.lifecycle_state === 'CUSTODIED_DBT' ? 'Qualified Investor · ZKP verified · identity protected' :
+                  {agent.lifecycle_state === 'EARNING_AUTONOMY' ? 'Qualified Investor · custodian recorded, ZKP not checked' :
+                   agent.lifecycle_state === 'CUSTODIED_DBT' ? 'Qualified Investor · custodian recorded, ZKP not checked' :
                    'None · agent-only liability · limited capability'}
                 </div>
               </div>

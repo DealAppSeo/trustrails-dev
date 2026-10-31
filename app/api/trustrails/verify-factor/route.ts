@@ -184,7 +184,9 @@ export async function POST(req: Request) {
         complete: true, 
         sbt_token_id, 
         on_chain_tx_hash, 
-        message: 'SBT minted' 
+        message: on_chain_tx_hash.startsWith('0xmocktx_') || on_chain_tx_hash === 'tx_failed'
+          ? 'SBT recorded off-chain; on-chain mint not done'
+          : 'SBT minted'
       });
     }
 

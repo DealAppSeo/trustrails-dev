@@ -23,7 +23,7 @@ export class KYAValidator {
       spendingLimitPerTx:   data.spending_limit_per_tx,
       insuranceCoverage:    data.insurance_coverage,
       collateralStaked:     data.collateral_staked,
-      zkpProofCID:          data.zkp_proof_cid || `ZKP_STUB_${agentName}_VERIFIED`,
+      zkpProofCID:          data.zkp_proof_cid || `ZKP_STUB_${agentName}_NOT_PROVEN`,
       humanCustodyVerified: data.human_custody_verified,
       vaultAccessPermitted: data.vault_access_permitted,
     };
