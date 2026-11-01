@@ -46,7 +46,7 @@ export function LiveReceiptFeed() {
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ color: '#f8fafc', fontWeight: 600 }}>{r.agent_name}</span>
                 <span style={{ color: r.bft_passed ? '#4ade80' : '#f87171' }}>
-                  {r.bft_passed ? 'COMPLIANT' : 'BLOCKED'}
+                  {r.bft_passed ? 'SIMULATED PASS' : 'BLOCKED'}
                 </span>
               </div>
               <div style={{ color: '#94a3b8', marginBottom: '8px' }}>
@@ -58,7 +58,7 @@ export function LiveReceiptFeed() {
                 {r.lifecycle_state === 'EARNING_AUTONOMY' ? (
                   <>
                     <div style={{ color: '#90cdf4', fontSize: '13px', fontFamily: 'monospace', marginBottom: '2px' }}>
-                      ⛓ Human custodian verified · approaching autonomy
+                      ⛓ Human custodian recorded, ZKP not checked · approaching autonomy
                     </div>
                     <div style={{ color: '#8b9ab0', fontSize: '13px', fontFamily: 'monospace' }}>
                       Custodian tier: {r.custodian_tier === 'qualified_investor' ? 'Qualified Investor' : 'Institutional'}
@@ -67,7 +67,7 @@ export function LiveReceiptFeed() {
                 ) : r.lifecycle_state === 'CUSTODIED_DBT' ? (
                   <>
                     <div style={{ color: '#90cdf4', fontSize: '13px', fontFamily: 'monospace', marginBottom: '2px' }}>
-                      ⛓ Human custodian verified · ZKP protected identity
+                      ⛓ Human custodian recorded, ZKP not checked
                     </div>
                     <div style={{ color: '#8b9ab0', fontSize: '13px', fontFamily: 'monospace' }}>
                       Custodian tier: {r.custodian_tier === 'qualified_investor' ? 'Qualified Investor' : 'Institutional'}
@@ -97,7 +97,7 @@ export function LiveReceiptFeed() {
                   </a>
                 )}
                 <span style={{ background: '#0f172a', padding: '2px 6px', borderRadius: 4, color: '#cbd5e1', fontSize: 13 }}>
-                  BFT: {r.bft_consensus_weight ? Math.round(r.bft_consensus_weight) : 89}%
+                  BFT: {r.bft_consensus_weight == null ? 'not recorded' : (r.bft_consensus_weight * 100).toFixed(1) + '%'}
                 </span>
               </div>
             </div>

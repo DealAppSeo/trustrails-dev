@@ -28,13 +28,13 @@ export class ZKPAttestationService {
     const attestation: ZKPAttestation = {
       proofCID,
       publicSignals: [
-        `agent_kya_verified:true`,
-        `repid_meets_threshold:true`,
-        `entity_not_sanctioned:true`,
-        `human_custody_bound:true`,
+        `agent_kya_verified:null`,
+        `repid_meets_threshold:null`,
+        `entity_not_sanctioned:null`,
+        `human_custody_bound:null`,
       ],
       verificationKey:  '0x8004B663056A597Dffe9eCcC1965A193B7388713',
-      proofSystem:      'groth16',
+      proofSystem:      'stub',
       circuitType:      'kya_repid_threshold_v1',
       generatedAt:      new Date().toISOString(),
       phase2Upgrade:    'Full FL-GNN zkML circuit via ezkl — proves exact RepID computation from private metrics without revealing inputs. Halo2 backend for cheaper on-chain verification. Planned post-hackathon pilot.',

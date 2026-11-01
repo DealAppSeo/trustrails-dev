@@ -49,8 +49,8 @@ AI agents are already moving institutional money. Treasury agents, trading agent
 TrustRails is the accountability infrastructure layer that answers this question — cryptographically, at every transaction, without exposing private identity.
 
 - **KYA (Know Your Agent)** — every agent has a verified, auditable identity and reputation score
-- **DBT/SBT Custodianship** — human accountability proven via ZKP without revealing identity
-- **BFT Consensus** — three independent LLMs vote on every high-value transaction
+- **DBT/SBT Custodianship** — a human custodian is recorded against the agent; the ZKP bond is a stub, so nothing is cryptographically proven yet
+- **BFT Consensus (simulated)** — a local rule simulation with a random 5% veto decides each payment; it is not a vote by three independent LLMs
 - **RepID** — earned reputation scores that decay if agents go inactive
 - **Institutional Controls** — your bank sets every threshold, we enforce it cryptographically
 
@@ -62,7 +62,7 @@ TrustRails is the accountability infrastructure layer that answers this question
 |---|---|---|
 | Dashboard | ✅ Live | [trustrails.dev/dashboard](https://trustrails.dev/dashboard) |
 | Landing Page | ✅ Live | [trustrails.dev](https://trustrails.dev) |
-| Solana Transactions | ✅ Finalized | 5 real devnet transactions |
+| Solana Transactions | ⚠️ Devnet, unconfirmed | SOL transfers (fixed 1,000,000 lamports, not USDC) are submitted to devnet; the code does not wait for confirmation |
 | ERC-8004 Registry | ✅ Live | Base Sepolia |
 | 12 Agent Swarm | ✅ Running | Railway + Supabase |
 
@@ -83,7 +83,7 @@ flowchart TD
     B -->|Yes| D{Does agent have\nhuman custodian?}
     D -->|No - DBT only| E{Amount within\nmicro-payment limit?}
     E -->|No| F[BLOCKED\nNo custodian for\nhigh-value tx]
-    E -->|Yes| G[SBFA BFT Vote\nClaude + Grok + Gemini]
+    E -->|Yes| G[BFT vote\nlocal rule simulation]
     D -->|Yes - SBT linked| G
     G --> H{BFT consensus\n≥ 66.7%?}
     H -->|No| I[BLOCKED\nConsensus failed]
@@ -92,7 +92,7 @@ flowchart TD
     J -->|Clear| L{Amount vs\ninstitution limits}
     L -->|Exceeds daily cap| M[BLOCKED\nExposure limit]
     L -->|Exceeds single-sig| N[ESCALATED\nDual signature\nrequired]
-    L -->|Within limits| O[APPROVED\nSolana settlement\nCompliance receipt generated]
+    L -->|Within limits| O[APPROVED\nDevnet transfer submitted\nunconfirmed\nCompliance receipt generated]
 
     style C fill:#7f1d1d,color:#fca5a5
     style F fill:#7f1d1d,color:#fca5a5
@@ -142,6 +142,8 @@ flowchart LR
 ---
 
 ### 3. SBFA — Stochastic Bias Fracture Array
+
+> Design target, not the shipped code. The shipped `BFTAuthorizer` is a local rule simulation with a 5% random veto; it does not call Claude, Grok or Gemini.
 
 ```mermaid
 flowchart TD
@@ -218,17 +220,17 @@ stateDiagram-v2
 
 ### 5. Compliance Receipt — On-Chain Audit Trail
 
-Every approved transaction generates an immutable compliance receipt anchored to Solana:
+Every approved transaction generates a compliance receipt labelled SIMULATED. The Solana side is an unconfirmed devnet SOL transfer with a memo; the ZKP CID is a stub and no Fireblocks pre-authorization is performed (`fireblocksPreAuthId` is null):
 
 ```mermaid
 flowchart LR
     TX[Transaction\napproved] --> R[Compliance\nReceipt]
 
-    R --> S1[Solana memo field\nCompliance hash\nRepID score\nBFT weight\nZKP proof CID]
-    R --> S2[Supabase record\nFull audit data\nFireblocks pre-auth\nTimestamp ISO]
-    R --> S3[On-chain proof\nImmutable forever\nRegulator-exportable\nNo trust required]
+    R --> S1[Solana memo field\nCompliance hash\nRepID score\nBFT weight\nZKP stub CID]
+    R --> S2[Supabase record\nFull audit data\nFireblocks pre-auth\nnot performed\nTimestamp ISO]
+    R --> S3[Devnet transaction\nunconfirmed]
 
-    S1 --> V[Verifiable\nindependently\nwithout asking us]
+    S1 --> V[Checkable against\nthe Supabase record\nand the devnet tx]
     S2 --> V
     S3 --> V
 
@@ -243,11 +245,11 @@ flowchart LR
 | Layer | Technology | Purpose |
 |---|---|---|
 | Identity | Base Sepolia + ERC-8004 | Portable agent identity across chains |
-| Settlement | Solana Devnet | 400ms finality, $0.00025/tx, memo field |
+| Settlement | Solana Devnet | Unconfirmed SOL transfer + memo field; no USDC moves |
 | Agent Commerce | x402 Protocol | Agent-to-agent micropayments |
 | Reputation | HyperDAG Protocol | RepID scoring DAG |
-| Consensus | SBFA (3× LLM BFT) | Correlated hallucination prevention |
-| Privacy | ZKP Custodianship | Prove accountability without revealing identity |
+| Consensus | Local rule simulation (SBFA is the design target) | Intended: correlated hallucination prevention; not delivered yet |
+| Privacy | ZKP Custodianship (stub) | Intended: prove accountability without revealing identity; nothing is proven yet |
 | Database | Supabase (276 tables) | Agent coordination and state |
 | Runtime | Railway (12 agents) | Neuromorphic 3×3+3 swarm |
 | Frontend | Next.js + Vercel | Dashboard and landing page |
@@ -291,17 +293,19 @@ Configure per deployment:
 
 ## Regulatory Compliance
 
-| Regulation | How TrustRails Addresses It |
+> Design intent only. The code performs no regulatory compliance check (`/api/trustrails/system-trust` reports `NOT_CHECKED`), and the ZKP is a stub.
+
+| Regulation | Design intent (not verified in code) |
 |---|---|
-| MiCA Art. 68 | Daily exposure caps enforced cryptographically |
-| MiCA Art. 82 | UBO verified via ZKP — proven without exposed |
-| FATF Rec. 16 | Travel Rule metadata attached to every cross-border tx |
+| MiCA Art. 68 | Daily exposure caps enforced in application code (`KYAValidator`) |
+| MiCA Art. 82 | Planned: UBO attested via ZKP (stub today; nothing is proven) |
+| FATF Rec. 16 | Planned: Travel Rule metadata on cross-border tx (not implemented) |
 | GENIUS Act | Stablecoin payment compliance controls |
 | FINMA Swiss | Conservative profile matches FINMA RS 2023 |
 | MAS Singapore | Singapore jurisdiction approval built in |
 | FCA UK | UK regulatory profile available |
-| GDPR | Identity never stored — ZKP only |
-| AML | Beneficial owner provably verified, never exposed |
+| GDPR | Design goal: identity not stored (ZKP is a stub today) |
+| AML | Design goal: beneficial owner attested via ZKP (stub today; not checked) |
 
 ---
 
