@@ -44,7 +44,7 @@ export default function Dashboard() {
     agentsOnline: 0,
     lastBft: '',
     hallucinationRate: '',
-    caught: 0,
+    caught: null as number | null,
     costSaved: '0.00',
     loaded: false
   });
@@ -100,7 +100,7 @@ export default function Dashboard() {
           agentsOnline: active || 0,
           lastBft: latestBft?.last_ping ? new Date(latestBft.last_ping).toLocaleTimeString() : '',
           hallucinationRate: totalLogs && totalLogs > 0 ? `${(((vetoedLogs || 0) / totalLogs) * 100).toFixed(1)}%` : '',
-          caught: totalLogs || 0,
+          caught: totalLogs ?? null, // null = not read; 0 = read and zero
           costSaved: ((tasksDone || 0) * 0.0047).toFixed(2),
           loaded: true
         });
@@ -301,7 +301,7 @@ export default function Dashboard() {
           <div style={{ display: 'flex', gap: '16px' }}>
             <div style={{ background: '#1e0f0f', border: '1px solid #7f1d1d', padding: '16px', borderRadius: '8px', minWidth: '160px' }}>
               <div style={{ fontSize: '13px', color: '#fca5a5', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 700 }}>Hallucinations</div>
-              <div style={{ fontSize: '24px', fontWeight: 900, color: '#ef4444' }}>{realStats.caught ? `${realStats.caught} CAUGHT` : 'not measured'}</div>
+              <div style={{ fontSize: '24px', fontWeight: 900, color: '#ef4444' }}>{realStats.caught == null ? 'not measured' : `${realStats.caught} CAUGHT`}</div>
             </div>
             <div style={{ background: '#0a1f12', border: '1px solid #14532d', padding: '16px', borderRadius: '8px', minWidth: '160px' }}>
               <div style={{ fontSize: '13px', color: '#86efac', marginBottom: '4px', textTransform: 'uppercase', fontWeight: 700 }}>Cost Saved</div>
