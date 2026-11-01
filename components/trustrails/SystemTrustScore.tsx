@@ -136,20 +136,6 @@ export function SystemTrustScore() {
           })}
         </div>
       )}
-
-      {data.regulatoryStatus?.aminaPilotReady && (
-        <div style={{
-          marginTop: 16,
-          background: '#1e3a5f',
-          border: '1px solid #3b82f6',
-          borderRadius: 8,
-          padding: '8px 16px',
-          fontSize: 13,
-          color: '#93c5fd',
-        }}>
-          🏦 AMINA Bank Pilot Ready — System trust score exceeds institutional threshold
-        </div>
-      )}
     </div>
   );
 }

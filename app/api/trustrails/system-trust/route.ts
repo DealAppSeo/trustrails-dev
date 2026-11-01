@@ -78,13 +78,13 @@ export async function GET() {
         ? ((totalTxns24h / (totalTxns24h + blockedTxns24h)) * 100).toFixed(1) + '%'
         : null,   // no attempts in 24h = not measured (rendered "not measured")
     },
-    // Regulatory readiness. None of these four is checked anywhere in this codebase.
+    // Regulatory readiness. None of these five is checked anywhere in this codebase.
     regulatoryStatus: {
       micaCompliant:    'NOT_CHECKED',
       geniusActReady:   'NOT_CHECKED',
       fatfAligned:      'NOT_CHECKED',
       fireblocksPreAuth: 'NOT_CHECKED',
-      aminaPilotReady:  systemScore >= 7500,
+      aminaPilotReady:  'NOT_CHECKED',   // was a RepID-score threshold; a score is not a readiness review
     },
   });
 }
