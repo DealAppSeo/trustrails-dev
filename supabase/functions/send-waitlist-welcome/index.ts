@@ -29,7 +29,7 @@ serve(async (req) => {
       <h1>You're on the TrustTrader waitlist 🎯</h1>
       <p>Thank you for joining the waitlist for TrustTrader—the definitive compliance engine for AI Agents.</p>
       <h2>Beat SOPHIA contest</h2>
-      <p>SOPHIA has issued 4 constitutional refusals. Drawdown: 0% vs 49.63% without veto.</p>
+      <p>SOPHIA is TrustTrader's paper-trading agent.</p>
       <p>Beat SOPHIA's 30-day P&L → Win Full tier for life ($499/mo value).</p>
       <p><a href="https://trusttrader.dev/trade">Enter the Challenge → trusttrader.dev/trade</a></p>
     `;
