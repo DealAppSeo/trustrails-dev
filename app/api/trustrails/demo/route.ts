@@ -4,6 +4,16 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+// `result` comes from the real /pay response. 503 = pay route disabled: nothing was checked.
+function payOutcome(res: Response, body: any): string {
+  if (res.status === 503) return 'NOT_CHECKED';
+  if (res.status === 202) return 'PENDING_AUTHORIZATION';
+  if (body?.approved) return 'APPROVED';
+  return res.status === 403 ? 'BLOCKED' : 'ERROR';
+}
+const payReason = (res: Response, body: any) =>
+  res.status === 503 ? 'pay route disabled' : (body?.reason ?? body?.message ?? null);
+
 export async function POST(req: NextRequest) {
   const isDev = process.env.NODE_ENV !== 'production';
   const BASE = isDev ? 'http://localhost:3000' : (process.env.NEXT_PUBLIC_APP_URL || 'https://trustrails.dev');
@@ -27,10 +37,10 @@ export async function POST(req: NextRequest) {
     beat:       1,
     title:      '⛔ Guardrail: DBT-only agent blocked from institutional transfer',
     agent:      'TORCH',
-    tier:       'Silver',
-    repid:      guardrail.agentRepid || 7600,
-    result:     'BLOCKED',
-    reason:     guardrail.reason || 'RepID below Gold threshold for this amount',
+    tier:       guardrail.tier ?? null,
+    repid:      guardrail.agentRepid ?? null,
+    result:     payOutcome(guardrailRes, guardrail),
+    reason:     payReason(guardrailRes, guardrail),
     regulatory: 'MiCA Art. 68 — Compliance controls prevent unauthorized transactions',
     message:    'Without TrustRails, this payment would execute. With TrustRails, guardrails are automatic. Silver agents are restricted to DBT (Data-Bound Token) micro-payments and cannot execute institutional transfers.',
   });
@@ -51,9 +61,10 @@ export async function POST(req: NextRequest) {
     beat:           2,
     title:          '✅ Hero: SBT-backed agent executes compliant transfer',
     agent:          'SOPHIA',
-    tier:           'Gold',
-    repid:          payment.receipt?.agentRepidScore || 8500,
-    result:         'APPROVED',
+    tier:           payment.receipt?.agentRepidTier ?? null,
+    repid:          payment.receipt?.agentRepidScore ?? null,
+    result:         payOutcome(paymentRes, payment),
+    reason:         payReason(paymentRes, payment),
     solanaTxHash:   payment.receipt?.solanaTxHash,
     explorerUrl:    payment.receipt?.solanaExplorerUrl,
     bftConsensus:   payment.receipt?.bftProof?.consensusWeight,
@@ -100,10 +111,10 @@ export async function POST(req: NextRequest) {
     beat:       4,
     title:      '⏳ Institutional: Pending Dual Signature',
     agent:      'SOPHIA',
-    tier:       'Gold',
+    tier:       dualSig.tier ?? null,
     status:     dualSigRes.status,
-    result:     'PENDING_AUTHORIZATION',
-    reason:     dualSig.message,
+    result:     payOutcome(dualSigRes, dualSig),
+    reason:     payReason(dualSigRes, dualSig),
     regulatory: 'Dual-control cryptographic delegation matrices (SBT bound)',
     message:    'SOPHIA is verified and capable, but $75,000 exceeds the $50k single-signature threshold. The API securely suspends execution (HTTP 202) pending human CTO & CFO co-signatures. The perfect union of agentic speed and institutional governance.',
   });
@@ -113,6 +124,7 @@ export async function POST(req: NextRequest) {
     version:   '1.0.0-stablehacks',
     tagline:   'The SSL Trust Layer for Autonomous Agent Finance',
     demoBeats: results.length,
+    note:      'title, message and story are scripted narrative; tier, repid, result and reason come from the live responses (null = not returned).',
     story:     [
       'Beat 1 — Villain: Guardrails block DBT-only agents from high-value transfers.',
       'Beat 2 — Hero: SBT-backed agents execute with cryptographic human liability and BFT consensus.',

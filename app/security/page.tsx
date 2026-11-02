@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 export default function SecurityDemoPage() {
   const [logs, setLogs] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
-  const [totalCaught, setTotalCaught] = useState(298);
+  const [totalCaught, setTotalCaught] = useState<number | null>(null); // null = not read
 
   useEffect(() => {
     const fetchSecurityLogs = async () => {
@@ -14,9 +14,7 @@ export default function SecurityDemoPage() {
           const data = await res.json();
           setLogs(data.logs);
           setEvents(data.events);
-          if (data.total && data.total > 0) {
-              setTotalCaught(298 + data.total);
-          }
+          if (typeof data.total === 'number') setTotalCaught(data.total); // a read 0 stays 0
         }
       } catch (err) {}
     };
@@ -32,7 +30,7 @@ export default function SecurityDemoPage() {
       {/* Header Counter */}
       <div style={{ textAlign: 'center', marginBottom: '40px', padding: '20px', border: '1px solid #DC2626', backgroundColor: '#450a0a', borderRadius: '12px' }}>
         <h1 style={{ fontSize: '32px', margin: '0 0 10px 0', color: '#FCA5A5' }}>
-          {totalCaught} HALLUCINATIONS CAUGHT | 0 REACHED OUTPUT
+          HALLUCINATIONS CAUGHT: {totalCaught == null ? 'not measured' : totalCaught} | REACHED OUTPUT: not measured
         </h1>
         <p style={{ margin: 0, color: '#f87171' }}>VERITAS Antivirus Layer Active</p>
       </div>

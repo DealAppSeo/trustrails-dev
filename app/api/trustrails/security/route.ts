@@ -14,10 +14,9 @@ export async function GET() {
       .order('created_at', { ascending: false })
       .limit(50);
       
-    // Stub total count or read exactly if needed
-    const totalCount = logCount || (logs ? logs.length : 0);
-
-    return NextResponse.json({ logs: logs || [], events: events || [], total: totalCount });
+    // total = the exact row count, or null when it was not read (a failed query returns no count).
+    // A 0 here means the table was read and is empty.
+    return NextResponse.json({ logs: logs || [], events: events || [], total: logCount ?? null });
 
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

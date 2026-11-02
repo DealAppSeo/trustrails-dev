@@ -47,6 +47,9 @@
 
 name: baseline
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main]
@@ -80,6 +83,21 @@ jobs:
       # No `|| true`. A failure here fails the PR, which is the whole point.
       - name: Build must succeed
         run: npm run build
+
+  # The tests need Node 22 (--experimental-strip-types, module.registerHooks), which is why the
+  # Node 20 jobs never ran them. They include the containment tests for /pay and every API write.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Tests must pass
+        run: npm test
 
   baseline:
     runs-on: ubuntu-latest
@@ -134,7 +152,7 @@ jobs:
               echo "| \`tsc --noEmit\` | **FAILED** — ${{ steps.tsc.outputs.count }} errors | was 119 |"
             fi
             echo "| \`next build\` | **${{ steps.build.outputs.result }}** | was FAILED |"
-            echo "| tests | **NOT CHECKED** — no test script in package.json | — |"
+            echo "| tests | see the \`test\` job (Node 22) | — |"
             echo ""
             echo "Known causes, both tracked separately:"
             echo "- typecheck: an unimported \`components/ui\` (shadcn) drop with missing deps and no \`lib/utils.ts\`."

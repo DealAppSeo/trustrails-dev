@@ -1,13 +1,11 @@
 const fs = require('fs');
 
 const files = [
-  'app/api/trustrails/internal/update-agent/route.ts',
   'components/trustrails/AgentRepIDGrid.tsx',
   'app/api/trustrails/receipts/route.ts',
   'lib/trustshell/BFTAuthorizer.ts',
   'app/api/trustrails/settings/route.ts',
   'app/api/trustrails/system-trust/route.ts',
-  'app/api/trustrails/internal/run-tasks/route.ts',
   'lib/trustshell/ComplianceReceipt.ts',
   'lib/trustshell/KYAValidator.ts',
   'lib/trustshell/RepIDConfig.ts',

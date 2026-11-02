@@ -184,7 +184,10 @@ export async function POST(req: Request) {
         complete: true, 
         sbt_token_id, 
         on_chain_tx_hash, 
-        message: 'SBT minted' 
+        // "minted" only for a real transaction hash: mock, failed, skipped and pending are not a mint.
+        message: /^0x[0-9a-fA-F]{64}$/.test(String(on_chain_tx_hash))
+          ? 'SBT minted'
+          : 'SBT recorded off-chain; on-chain mint not done'
       });
     }
 

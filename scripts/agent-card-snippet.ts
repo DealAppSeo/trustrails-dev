@@ -30,15 +30,18 @@ export function attachAgentCard(app: any) {
         return res.status(404).json({ error: 'Agent not found in registry' });
       }
 
+      // Only what the registry row says. Unread = null / NOT_CHECKED, never an invented value.
+      const kyaVerified = data.kya_verified === true;
+
       // ERC-8004 Compliant Payload
       res.json({
         "@context": "https://w3id.org/agent-card/v1",
         "type": "AgentCard",
-        "id": `did:pkh:eip155:84532:${data.agent_id_onchain || 'unregistered'}`,
+        "id": data.agent_id_onchain ? `did:pkh:eip155:84532:${data.agent_id_onchain}` : null,
         "name": data.agent_name,
-        "trusted": true,
+        "trusted": kyaVerified ? true : null,
         "kya_attestation": {
-          "status": "verified",
+          "status": kyaVerified ? "verified" : "NOT_CHECKED",
           "repid_score": data.repid_score,
           "repid_tier": data.repid_tier,
           "human_custody_verified": data.human_custody_verified,
@@ -46,8 +49,8 @@ export function attachAgentCard(app: any) {
           "registered_at": data.registered_at
         },
         "endpoints": {
-          "mcp": "/mcp",
-          "chat": "/chat"
+          "mcp": data.mcp_endpoint ?? null,
+          "chat": data.chat_endpoint ?? null
         }
       });
     } catch (e: any) {

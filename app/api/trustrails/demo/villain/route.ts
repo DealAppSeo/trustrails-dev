@@ -63,10 +63,8 @@ export async function POST() {
       }
     }
 
-    if (!blockReason) {
-      blockReason = `Transaction blocked: ${scenario.amount} USDC exceeds RepID-earned limit for ${kyaResult.repidTier} tier`;
-      blockStage  = 'spending_limit_gate';
-    }
+    // No gate fired = NOT blocked. Do not invent a reason.
+    const blocked = blockStage !== '';
 
     results.push({
       scenario:        scenario.scenario,
@@ -75,15 +73,15 @@ export async function POST() {
       agentRepidScore: kyaResult.repidScore,
       agentRepidTier:  kyaResult.repidTier,
       attemptedAmount: scenario.amount,
-      result:          'BLOCKED',
-      blockStage,
-      blockReason,
+      result:          blocked ? 'BLOCKED' : 'NOT_BLOCKED',
+      blockStage:      blocked ? blockStage : null,
+      blockReason:     blocked ? blockReason : null,
       // What the agent would need to attempt this legitimately
-      pathToApproval: scenario.action.includes('vault')
+      pathToApproval: !blocked ? null : scenario.action.includes('vault')
         ? `Agent needs Gold tier (RepID 7,500+), human custody verification, and vault access permission. Current RepID: ${kyaResult.repidScore}.`
         : `Agent needs ${scenario.amount > 50000 ? 'Platinum' : 'Gold'} tier. Current RepID: ${kyaResult.repidScore}. Path: earn trust through compliant transactions.`,
       // Regulatory mapping — why this block matters
-      regulatoryMapping: {
+      regulatoryMapping: !blocked ? null : {
         mica:       'MiCA Art. 68 — Compliance controls must prevent unauthorized transactions',
         geniusAct:  'GENIUS Act §12 — Stablecoin issuers must maintain transaction controls',
         fatf:       'FATF Rec. 16 — Travel Rule requires verified counterparty identification',
@@ -92,13 +90,17 @@ export async function POST() {
     });
   }
 
+  const blockedResults = results.filter(r => r.result === 'BLOCKED');
+
   return NextResponse.json({
     product:  'TrustRails',
     demoType: 'villain_moment',
-    message:  'TrustRails blocked all 3 non-compliant agent attempts. Guardrails work.',
+    message:  blockedResults.length === results.length
+      ? `TrustRails blocked all ${results.length} non-compliant agent attempts. Guardrails work.`
+      : `${blockedResults.length} of ${results.length} attempts were blocked; the rest were NOT blocked.`,
     summary: {
-      attemptsBlocked:  results.length,
-      totalValueBlocked: villainScenarios.reduce((s, v) => s + v.amount, 0),
+      attemptsBlocked:  blockedResults.length,
+      totalValueBlocked: blockedResults.reduce((s, r) => s + r.attemptedAmount, 0),
       regulatoryFrameworks: ['MiCA', 'GENIUS Act', 'FATF Rec. 16', 'AMINA Policy'],
     },
     blockedAttempts: results,
